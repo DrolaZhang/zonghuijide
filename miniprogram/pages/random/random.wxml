@@ -11,11 +11,9 @@
 
   <view class="content" wx:if="{{currentRow}}">
     <view class="row-data">
-      <view class="data-item" wx:for="{{currentRow}}" wx:key="*this" wx:for-index="key">
-        <text class="key">{{key}}:</text>
-        <text class="value">{{item}}</text>
-      </view>
+      <text class="row-content">{{currentRow}}</text>
     </view>
+    <view class="timer">{{countdown}}s 后更新</view>
   </view>
 
   <button class="next-btn" bindtap="onNextTap">下一条</button>
