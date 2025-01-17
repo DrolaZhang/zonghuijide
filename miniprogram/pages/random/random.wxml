@@ -1,0 +1,22 @@
+<view class="container">
+  <view class="header">
+    <view class="title-row">
+      <text class="title">{{jsonName}}</text>
+      <view class="delete-btn" bindtap="deleteFile">
+        <text class="delete-icon">×</text>
+      </view>
+    </view>
+    <text class="total">共 {{total}} 条数据</text>
+  </view>
+
+  <view class="content" wx:if="{{currentRow}}">
+    <view class="row-data">
+      <view class="data-item" wx:for="{{currentRow}}" wx:key="*this" wx:for-index="key">
+        <text class="key">{{key}}:</text>
+        <text class="value">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <button class="next-btn" bindtap="onNextTap">下一条</button>
+</view> 

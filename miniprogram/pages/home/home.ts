@@ -2,7 +2,11 @@ interface FileItem {
   name: string;
   uploadTime: string;
   path: string;
-  data?: any; // 存储解析后的JSON数据
+  jsonName: string;  // 添加 JSON 文件名
+  data: {
+    total: number;
+    rows: any[];
+  };
 }
 
 interface IPageData {
@@ -83,19 +87,35 @@ Page<IPageData>({
       extension: ['.xlsx', '.xls'],
       success: async (res) => {
         const file = res.tempFiles[0];
-        wx.showLoading({ title: '正在解析文件...' });
+        
+        if (!file.name.match(/\.(xlsx|xls)$/i)) {
+          wx.showToast({
+            title: '请选择Excel文件',
+            icon: 'none'
+          });
+          return;
+        }
+
+        wx.showLoading({ 
+          title: '正在解析文件...',
+          mask: true
+        });
 
         try {
-          // 将文件转换为base64
           const base64Data = await this.fileToBase64(file.path);
-          
-          // 调用API解析Excel
           const parsedData = await this.parseExcel(base64Data);
+          
+          // 获取文件名（去除后缀）
+          const jsonName = file.name.replace(/\.(xlsx|xls)$/i, '');
+          
+          // 保存 JSON 到本地存储
+          wx.setStorageSync(jsonName, parsedData);
 
           const newFile: FileItem = {
             name: file.name,
             path: file.path,
             uploadTime: new Date().toLocaleString(),
+            jsonName,
             data: parsedData
           };
 
@@ -161,17 +181,42 @@ Page<IPageData>({
       content: `是否删除文件 ${file.name}？`,
       success: (res) => {
         if (res.confirm) {
-          const fileList = this.data.fileList.filter(
-            item => item.name !== file.name
-          );
-          this.setData({ fileList });
-          wx.setStorageSync('excelFiles', fileList);
-          
-          wx.showToast({
-            title: '删除成功',
-            icon: 'success'
-          });
+          try {
+            // 删除本地存储的JSON数据
+            wx.removeStorageSync(file.jsonName);
+            
+            // 从文件列表中移除
+            const fileList = this.data.fileList.filter(
+              item => item.jsonName !== file.jsonName
+            );
+            
+            // 更新状态和存储
+            this.setData({ fileList });
+            wx.setStorageSync('excelFiles', fileList);
+            
+            wx.showToast({
+              title: '删除成功',
+              icon: 'success'
+            });
+          } catch (error) {
+            console.error('删除文件失败：', error);
+            wx.showToast({
+              title: '删除失败',
+              icon: 'error'
+            });
+          }
         }
+      }
+    });
+  },
+
+  // 跳转到随机显示页面
+  goToRandomView(e: any) {
+    const file = e.currentTarget.dataset.file;
+    wx.navigateTo({
+      url: `/pages/random/random?jsonName=${encodeURIComponent(file.jsonName)}`,
+      fail: (err) => {
+        console.error('页面跳转失败：', err);
       }
     });
   }

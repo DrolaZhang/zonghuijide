@@ -81,4 +81,27 @@
 .delete {
   color: #FF3B30;
   background: rgba(255, 59, 48, 0.1);
+}
+
+.file-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.delete-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20rpx;
+  background: rgba(255, 59, 48, 0.1);
+  border-radius: 30rpx;
+}
+
+.delete-icon {
+  color: #FF3B30;
+  font-size: 40rpx;
+  font-weight: bold;
 } 
