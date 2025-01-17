@@ -6,15 +6,27 @@
         <text class="delete-icon">×</text>
       </view>
     </view>
-    <text class="total">共 {{total}} 条数据</text>
+    
+    <!-- 进度条 -->
+    <view class="progress-container">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{(rememberedCount/total) * 100}}%"></view>
+      </view>
+      <text class="progress-text">{{rememberedCount}}/{{total}}</text>
+    </view>
   </view>
 
-  <view class="content" wx:if="{{currentRow}}">
+  <view class="content" wx:if="{{currentRow.length > 0}}">
     <view class="row-data">
-      <text class="row-content">{{currentRow}}</text>
+      <view wx:for="{{currentRow}}" wx:key="index" class="row-item">
+        {{item}}
+      </view>
     </view>
     <view class="timer">{{countdown}}s 后更新</view>
   </view>
 
-  <button class="next-btn" bindtap="onNextTap">下一条</button>
+  <view class="button-group">
+    <button class="action-btn remembered" bindtap="onRemembered">记住了</button>
+    <button class="action-btn not-remembered" bindtap="onNotRemembered">没记住</button>
+  </view>
 </view> 

@@ -1,17 +1,19 @@
 interface IPageData {
   jsonName: string;
-  currentRow: string;
+  currentRow: string[];
   total: number;
   countdown: number;
   timer?: number;
+  rememberedCount: number;
 }
 
 Page<IPageData>({
   data: {
     jsonName: '',
-    currentRow: '',
+    currentRow: [],
     total: 0,
-    countdown: 10
+    countdown: 10,
+    rememberedCount: 0
   },
 
   onLoad(options: Record<string, string>) {
@@ -19,10 +21,15 @@ Page<IPageData>({
       const jsonName = decodeURIComponent(options.jsonName);
       this.setData({ jsonName });
       
-      // 获取JSON数据
+      // 获取JSON数据和已记住的数据
       const jsonData = wx.getStorageSync(jsonName);
+      const rememberedData = wx.getStorageSync(`${jsonName}_remembered`) || [];
+      
       if (jsonData) {
-        this.setData({ total: jsonData.total });
+        this.setData({ 
+          total: jsonData.total,
+          rememberedCount: rememberedData.length
+        });
         this.showRandomRow();
         this.startTimer();
       }
@@ -67,19 +74,65 @@ Page<IPageData>({
 
   showRandomRow() {
     const jsonData = wx.getStorageSync(this.data.jsonName);
+    const rememberedData = wx.getStorageSync(`${this.data.jsonName}_remembered`) || [];
+    
     if (jsonData && jsonData.rows.length > 0) {
-      const randomIndex = Math.floor(Math.random() * jsonData.rows.length);
-      // 将对象的所有值连接成一个字符串
-      const rowContent = Object.values(jsonData.rows[randomIndex]).join(' ');
+      // 过滤掉已记住的行
+      const availableRows = jsonData.rows.filter(row => 
+        !rememberedData.some((remembered: any) => 
+          JSON.stringify(row) === JSON.stringify(remembered)
+        )
+      );
+
+      if (availableRows.length === 0) {
+        wx.showModal({
+          title: '恭喜',
+          content: '你已经记住了所有的内容！',
+          showCancel: false,
+          success: () => {
+            wx.navigateBack();
+          }
+        });
+        return;
+      }
+
+      const randomIndex = Math.floor(Math.random() * availableRows.length);
+      const row = availableRows[randomIndex];
+      
+      // 将对象的值转换为字符串数组
+      const rowContent = Object.values(row).map(value => String(value));
       this.setData({
         currentRow: rowContent
       });
     }
   },
 
-  onNextTap() {
+  onRemembered() {
+    const jsonData = wx.getStorageSync(this.data.jsonName);
+    const rememberedData = wx.getStorageSync(`${this.data.jsonName}_remembered`) || [];
+    
+    // 找到当前显示的行
+    const currentRowStr = this.data.currentRow.join('');
+    const currentRowData = jsonData.rows.find(row => 
+      Object.values(row).join('') === currentRowStr
+    );
+
+    if (currentRowData) {
+      // 添加到已记住列表
+      rememberedData.push(currentRowData);
+      wx.setStorageSync(`${this.data.jsonName}_remembered`, rememberedData);
+      
+      this.setData({ rememberedCount: rememberedData.length });
+      
+      // 显示下一行
+      this.showRandomRow();
+      this.startTimer();
+    }
+  },
+
+  onNotRemembered() {
     this.showRandomRow();
-    this.startTimer(); // 重置定时器
+    this.startTimer();
   },
 
   deleteFile() {
