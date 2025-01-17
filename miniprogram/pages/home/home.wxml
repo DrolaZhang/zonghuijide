@@ -1,0 +1,21 @@
+<view class="container">
+  <!-- 上传按钮 -->
+  <view class="upload-btn" bindtap="chooseFile">
+    <text class="plus">+</text>
+  </view>
+
+  <!-- Excel文件列表 -->
+  <view class="file-list">
+    <view class="file-item" wx:for="{{fileList}}" wx:key="name">
+      <view class="file-icon">{{item.name.slice(0, 4)}}</view>
+      <view class="file-info">
+        <text class="file-name">{{item.name}}</text>
+        <text class="file-time">{{item.uploadTime}}</text>
+      </view>
+      <view class="file-actions">
+        <text class="action-btn view" bindtap="viewFile" data-file="{{item}}">查看</text>
+        <text class="action-btn delete" bindtap="deleteFile" data-file="{{item}}">删除</text>
+      </view>
+    </view>
+  </view>
+</view> 
