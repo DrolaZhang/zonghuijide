@@ -1,51 +1,39 @@
 <view class="container">
-  <!-- 功能描述卡片 -->
-  <view class="intro-card">
-    <view class="intro-title">Excel 记忆助手</view>
-    <view class="intro-features">
-      <view class="feature-item">
-        <text class="feature-dot">•</text>
-        <text>上传 Excel 文件进行内容记忆训练</text>
-      </view>
-      <view class="feature-item">
-        <text class="feature-dot">•</text>
-        <text>系统随机展示内容，帮助记忆</text>
-      </view>
-      <view class="feature-item">
-        <text class="feature-dot">•</text>
-        <text>记录已掌握内容的学习进度</text>
-      </view>
-      <view class="feature-item">
-        <text class="feature-dot">•</text>
-        <text>支持多个文件同时训练</text>
-      </view>
+  <!-- 顶部描述区域 -->
+  <view class="header">
+    <view class="title">Excel 记忆助手</view>
+    <view class="subtitle">上传Excel文件，开始你的记忆训练</view>
+  </view>
+
+  <!-- 中央上传按钮 -->
+  <view class="center-upload">
+    <view class="upload-btn" bindtap="chooseFile">
+      <view class="upload-icon">+</view>
+      <view class="upload-text">上传Excel</view>
     </view>
   </view>
 
-  <!-- 上传按钮 -->
-  <view class="upload-btn" bindtap="chooseFile">
-    <text class="plus">+</text>
-  </view>
-
-  <!-- 文件列表 -->
-  <view class="file-list">
-    <view class="file-item" wx:for="{{fileList}}" wx:key="jsonName">
-      <view class="file-content" bindtap="goToRandomView" data-file="{{item}}">
-        <view class="file-icon">{{item.name.slice(0, 4)}}</view>
-        <view class="file-info">
+  <!-- 文件网格 -->
+  <view class="files-section" wx:if="{{fileList.length > 0}}">
+    <view class="section-title">已上传文件</view>
+    <view class="file-grid">
+      <view 
+        class="file-btn" 
+        wx:for="{{fileList}}" 
+        wx:key="jsonName"
+        bindtap="goToRandomView" 
+        data-file="{{item}}"
+      >
+        <view class="file-content">
           <text class="file-name">{{item.name}}</text>
-          <text class="file-time">{{item.uploadTime}}</text>
-          <text class="file-count">共 {{item.data.total}} 条数据</text>
+          <text class="file-count">{{item.data.total}}条记录</text>
         </view>
-      </view>
-      <view class="delete-btn" catchtap="deleteFile" data-file="{{item}}">
-        <text class="delete-icon">×</text>
+        <view 
+          class="delete-icon" 
+          catchtap="deleteFile" 
+          data-file="{{item}}"
+        >×</view>
       </view>
     </view>
-  </view>
-
-  <!-- 空状态提示 -->
-  <view class="empty-state" wx:if="{{fileList.length === 0}}">
-    <text>点击上方"+"按钮上传Excel文件开始训练</text>
   </view>
 </view> 
