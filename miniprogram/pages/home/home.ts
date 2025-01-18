@@ -389,5 +389,20 @@ Page<IPageData>({
         }
       }
     });
+  },
+
+  // 分享给好友
+  onShareAppMessage() {
+    return {
+      title: '总会记住',
+      path: '/pages/home/home'
+    }
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: '总会记住'
+    }
   }
 }); 
