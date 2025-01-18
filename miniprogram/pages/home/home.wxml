@@ -22,7 +22,7 @@
         data-file="{{item}}"
       >
         <view class="file-content">
-          <text class="file-name">{{item.name}}</text>
+          <text class="file-name">{{item.jsonName}}</text>
           <view class="progress-container">
             <view class="progress-bar">
               <view 

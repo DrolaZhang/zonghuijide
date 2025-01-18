@@ -20,7 +20,8 @@ Page<IPageData>({
   },
 
   onLoad() {
-    const fileList = wx.getStorageSync('excelFiles') || [];
+    const fileList = wx.getStorageSync('jsonFiles') || [];
+    console.log(fileList)
     this.setData({ fileList });
   },
 
@@ -122,7 +123,7 @@ Page<IPageData>({
 
           const fileList = [...this.data.fileList, newFile];
           this.setData({ fileList });
-          wx.setStorageSync('excelFiles', fileList);
+          wx.setStorageSync('jsonFiles', fileList);
 
           wx.hideLoading();
           wx.showToast({
@@ -193,7 +194,7 @@ Page<IPageData>({
             
             // 更新状态和存储
             this.setData({ fileList });
-            wx.setStorageSync('excelFiles', fileList);
+            wx.setStorageSync('jsonFiles', fileList);
             
             wx.showToast({
               title: '删除成功',
@@ -262,11 +263,11 @@ Page<IPageData>({
       wx.setStorageSync(jsonName, parsedData);
       
       // 获取现有文件列表并添加新文件
-      const existingFiles = wx.getStorageSync('excelFiles') || [];
+      const existingFiles = wx.getStorageSync('jsonFiles') || [];
       const updatedFiles = [newFile, ...existingFiles];
       
       // 保存文件列表
-      wx.setStorageSync('excelFiles', updatedFiles);
+      wx.setStorageSync('jsonFiles', updatedFiles);
       
       // 初始化已记住的数据
       wx.setStorageSync(`${jsonName}_remembered`, []);
@@ -291,18 +292,51 @@ Page<IPageData>({
   },
 
   updateFileList() {
-    const fileList = wx.getStorageSync('excelFiles') || [];
+    const fileList = wx.getStorageSync('jsonFiles') || [];
+    console.log(fileList)
     
     // 更新每个文件的记忆进度
     const updatedFileList = fileList.map(file => {
-      const rememberedData = wx.getStorageSync(`${file.jsonName}_remembered`) || [];
-      return {
-        ...file,
-        rememberedCount: rememberedData.length
-      };
+      try {
+        // 获取文件的原始数据
+        const fileData = wx.getStorageSync(file.jsonName);
+        // 获取已记住的数据
+        const rememberedData = wx.getStorageSync(`${file.jsonName}_remembered`) || [];
+        // 计算总数和已记住的数量
+        const total = fileData.total;
+        const rememberedCount = Array.isArray(rememberedData) ? rememberedData.length : 0;
+        
+        console.log('File:', file.jsonName, 'Total:', total, 'Remembered:', rememberedCount); // 调试日志
+        
+        return {
+          ...file,
+          data: {
+            total: total,
+            rows: fileData || []
+          },
+          rememberedCount: rememberedCount
+        };
+      } catch (error) {
+        console.error('更新文件进度失败：', file.name, error);
+        // 如果出错，至少保持原有的数据结构
+        return {
+          ...file,
+          data: {
+            total: 0,
+            rows: []
+          },
+          rememberedCount: 0
+        };
+      }
     });
     
+    console.log('Updated file list:', updatedFileList); // 调试日志
     this.setData({ fileList: updatedFileList });
+  },
+
+  onShow() {
+    // 每次显示页面时更新列表
+    this.updateFileList();
   },
 
   showDeleteConfirm(e: any) {
@@ -334,7 +368,7 @@ Page<IPageData>({
             );
             
             // 更新状态和存储
-            wx.setStorageSync('excelFiles', fileList);
+            wx.setStorageSync('jsonFiles', fileList);
             this.updateFileList();
             
             wx.showToast({
