@@ -2,7 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/home/home",
-    "pages/random/random"
+    "pages/remember/remember"
   ],
   "window": {
     "navigationBarTextStyle": "black",

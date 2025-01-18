@@ -224,10 +224,7 @@ Page<IPageData>({
   goToRandomView(e: any) {
     const file = e.currentTarget.dataset.file;
     wx.navigateTo({
-      url: `/pages/random/random?jsonName=${encodeURIComponent(file.jsonName)}`,
-      fail: (err) => {
-        console.error('页面跳转失败：', err);
-      }
+      url: `/pages/remember/remember?jsonName=${encodeURIComponent(file.jsonName)}&fileName=${encodeURIComponent(file.name)}`
     });
   },
 
