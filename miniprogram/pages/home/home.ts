@@ -98,6 +98,14 @@ Page<IPageData>({
           return;
         }
 
+        if(this.data.fileList.some(item => item.name === file.name)) {
+          wx.showToast({
+            title: '不支持同名文件，请重命名并重试',
+            icon: 'none'
+          });
+          return;
+        }
+
         wx.showLoading({ 
           title: '正在解析文件...',
           mask: true
@@ -293,7 +301,6 @@ Page<IPageData>({
 
   updateFileList() {
     const fileList = wx.getStorageSync('jsonFiles') || [];
-    console.log(fileList)
     
     // 更新每个文件的记忆进度
     const updatedFileList = fileList.map(file => {
