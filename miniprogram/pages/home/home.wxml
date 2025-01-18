@@ -1,38 +1,38 @@
 <view class="container">
-  <!-- 顶部描述区域 -->
   <view class="header">
-    <view class="title">Excel 记忆助手</view>
-    <view class="subtitle">上传Excel文件，开始你的记忆训练</view>
+    <view class="title">总会记住</view>
+    <view class="subtitle">上传Excel开始你的记忆之旅</view>
   </view>
 
-  <!-- 中央上传按钮 -->
-  <view class="center-upload">
+  <view class="fixed-upload {{fileList.length > 0 ? 'upload-shifted' : ''}}">
     <view class="upload-btn" bindtap="chooseFile">
       <view class="upload-icon">+</view>
-      <view class="upload-text">上传Excel</view>
+      <view class="upload-text">更多记忆</view>
     </view>
   </view>
 
-  <!-- 文件网格 -->
-  <view class="files-section" wx:if="{{fileList.length > 0}}">
-    <view class="section-title">已上传文件</view>
+  <view class="files-section {{fileList.length > 0 ? 'has-files' : ''}}">
     <view class="file-grid">
       <view 
         class="file-btn" 
         wx:for="{{fileList}}" 
-        wx:key="jsonName"
+        wx:key="jsonPath"
         bindtap="goToRandomView" 
+        bindlongpress="showDeleteConfirm"
         data-file="{{item}}"
       >
         <view class="file-content">
           <text class="file-name">{{item.name}}</text>
-          <text class="file-count">{{item.data.total}}条记录</text>
+          <view class="progress-container">
+            <view class="progress-bar">
+              <view 
+                class="progress-fill"
+                style="width: {{(item.rememberedCount || 0) / item.data.total * 100}}%"
+              ></view>
+            </view>
+            <text class="progress-text">{{(item.rememberedCount || 0)}}/{{item.data.total}}</text>
+          </view>
         </view>
-        <view 
-          class="delete-icon" 
-          catchtap="deleteFile" 
-          data-file="{{item}}"
-        >×</view>
       </view>
     </view>
   </view>

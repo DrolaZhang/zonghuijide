@@ -1,12 +1,13 @@
 interface FileItem {
   name: string;
-  uploadTime: string;
   path: string;
-  jsonName: string;  // 添加 JSON 文件名
+  uploadTime: string;
+  jsonName: string;
   data: {
     total: number;
     rows: any[];
   };
+  rememberedCount?: number;
 }
 
 interface IPageData {
@@ -15,7 +16,7 @@ interface IPageData {
 
 Page<IPageData>({
   data: {
-    fileList: []
+    fileList: [] as FileItem[]
   },
 
   onLoad() {
@@ -217,6 +218,137 @@ Page<IPageData>({
       url: `/pages/random/random?jsonName=${encodeURIComponent(file.jsonName)}`,
       fail: (err) => {
         console.error('页面跳转失败：', err);
+      }
+    });
+  },
+
+  async processExcelFile(filePath: string, fileName: string) {
+    try {
+      wx.showLoading({
+        title: '处理中...',
+        mask: true
+      });
+
+      // 读取文件为 base64
+      const fileData = await new Promise((resolve, reject) => {
+        wx.getFileSystemManager().readFile({
+          filePath: filePath,
+          encoding: 'base64',
+          success: res => resolve(res.data as string),
+          fail: err => reject(err)
+        });
+      });
+
+      // 调用云函数解析 Excel
+      const parsedData = await this.parseExcel(fileData);
+
+      // 去掉文件扩展名作为 jsonName
+      const jsonName = fileName.replace(/\.(xlsx|xls)$/i, '');
+
+      // 创建新的文件记录
+      const newFile: FileItem = {
+        name: fileName,
+        path: filePath,
+        uploadTime: new Date().toLocaleString(),
+        jsonName: jsonName,
+        data: {
+          total: parsedData.length,
+          rows: parsedData
+        },
+        rememberedCount: 0
+      };
+
+      // 保存解析后的数据
+      wx.setStorageSync(jsonName, parsedData);
+      
+      // 获取现有文件列表并添加新文件
+      const existingFiles = wx.getStorageSync('excelFiles') || [];
+      const updatedFiles = [newFile, ...existingFiles];
+      
+      // 保存文件列表
+      wx.setStorageSync('excelFiles', updatedFiles);
+      
+      // 初始化已记住的数据
+      wx.setStorageSync(`${jsonName}_remembered`, []);
+      
+      // 更新页面显示
+      this.updateFileList();
+      
+      wx.showToast({
+        title: '上传成功',
+        icon: 'success'
+      });
+
+    } catch (error) {
+      console.error('处理文件失败：', error);
+      wx.showToast({
+        title: '处理失败',
+        icon: 'error'
+      });
+    } finally {
+      wx.hideLoading();
+    }
+  },
+
+  updateFileList() {
+    const fileList = wx.getStorageSync('excelFiles') || [];
+    
+    // 更新每个文件的记忆进度
+    const updatedFileList = fileList.map(file => {
+      const rememberedData = wx.getStorageSync(`${file.jsonName}_remembered`) || [];
+      return {
+        ...file,
+        rememberedCount: rememberedData.length
+      };
+    });
+    
+    this.setData({ fileList: updatedFileList });
+  },
+
+  showDeleteConfirm(e: any) {
+    const file = e.currentTarget.dataset.file;
+    if (!file || !file.jsonName) {
+      console.error('文件名未找到', file);
+      wx.showToast({
+        title: '删除失败',
+        icon: 'error'
+      });
+      return;
+    }
+
+    wx.showModal({
+      title: '确认删除',
+      content: `是否删除「${file.name.replace(/\.(xlsx|xls)$/i, '')}」？`,
+      confirmText: '删除',
+      confirmColor: '#FF3B30',
+      success: (res) => {
+        if (res.confirm) {
+          try {
+            // 删除存储的数据
+            wx.removeStorageSync(file.jsonName);
+            wx.removeStorageSync(`${file.jsonName}_remembered`);
+            
+            // 从文件列表中移除
+            const fileList = this.data.fileList.filter(
+              item => item.jsonName !== file.jsonName
+            );
+            
+            // 更新状态和存储
+            wx.setStorageSync('excelFiles', fileList);
+            this.updateFileList();
+            
+            wx.showToast({
+              title: '已删除',
+              icon: 'success'
+            });
+          } catch (error) {
+            console.error('删除操作失败：', error);
+            wx.showToast({
+              title: '删除失败',
+              icon: 'error'
+            });
+          }
+        }
       }
     });
   }
