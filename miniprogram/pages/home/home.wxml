@@ -1,5 +1,5 @@
 <view class="container">
-  <view class="header">
+  <view class="header" wx:if="{{!fileList.length}}">
     <view class="title">总会记住</view>
     <view class="subtitle">上传Excel开始你的记忆之旅</view>
   </view>
