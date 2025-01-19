@@ -2,7 +2,7 @@
   <block wx:if="{{!fileList.length}}">
     <view class="header">
       <text class="title">总会记住</text>
-      <text class="subtitle">上传Excel开始你的记忆之旅</text>
+      <text class="subtitle">上传Excel开始定制化记忆课程</text>
     </view>
   </block>
 
@@ -24,7 +24,8 @@
           <text class="file-name">{{item.name}}</text>
           <view class="progress-container">
             <view class="progress-bar">
-              <view class="progress-fill" style="width: {{item.rememberedCount || 0 / item.data.total * 100}}%"></view>
+              <view class="progress-fill" style="width: {{(item.rememberedCount || 0) / item.data.total * 100}}%">
+              </view>
             </view>
             <text class="progress-text">{{item.rememberedCount || 0}}/{{item.data.total}}</text>
           </view>
