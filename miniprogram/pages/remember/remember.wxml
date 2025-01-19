@@ -1,29 +1,46 @@
 <view class="container">
-  <view class="header">
-    <view class="title-row">
-      <text class="title">{{jsonName}}</text>
-    </view>
-    
-    <!-- 进度条 -->
-    <view class="progress-container">
-      <view class="progress-bar">
-        <view class="progress-fill" style="width: {{(rememberedCount/total) * 100}}%"></view>
+  <view class="weui-tabs">
+    <view class="weui-tabs-bar__wrp">
+      <view class="weui-tabs-bar">
+        <view class="weui-tabs-bar__item {{activeTab === 'learning' ? 'weui-tabs-bar__item_on' : ''}}" bindtap="switchTab" data-tab="learning">
+          <view class="weui-tabs-bar__title">记忆中</view>
+        </view>
+        <view class="weui-tabs-bar__item {{activeTab === 'remembered' ? 'weui-tabs-bar__item_on' : ''}}" bindtap="switchTab" data-tab="remembered">
+          <view class="weui-tabs-bar__title">已记住</view>
+        </view>
       </view>
-      <text class="progress-text">{{rememberedCount}}/{{total}}</text>
     </view>
   </view>
 
-  <view class="content" wx:if="{{currentRow.length > 0}}">
-    <view class="row-data">
-      <view wx:for="{{currentRow}}" wx:key="index" class="row-item">
-        {{item}}
+  <view wx:if="{{activeTab === 'learning'}}">
+    <view class="content" wx:if="{{rememberRow.length > 0}}">
+      <view class="row-data">
+        <view wx:for="{{rememberRow}}" wx:key="index" class="row-item">
+          {{item}}
+        </view>
       </view>
+      <view class="timer">{{countdown}}s 后更新</view>
     </view>
-    <view class="timer">{{countdown}}s 后更新</view>
-  </view>
 
-  <view class="button-group">
-    <button class="action-btn remembered" bindtap="onRemembered">记住了</button>
-    <button class="action-btn not-remembered" bindtap="onNotRemembered">没记住</button>
+    <view class="button-group">
+      <button class="action-btn remembered" bindtap="onRemembered">记住了</button>
+      <button class="action-btn not-remembered" bindtap="onNotRemembered">没记住</button>
+    </view>
+
   </view>
-</view> 
+  <view wx:if="{{activeTab === 'remembered'}}">
+    <view class="content" wx:if="{{rememberedRow.length > 0}}">
+      <view class="row-data">
+        <view wx:for="{{rememberedRow}}" wx:key="index" class="row-item">
+          {{item}}
+        </view>
+      </view>
+      <view class="timer">{{countdown}}s 后更新</view>
+    </view>
+
+    <view class="button-group">
+      <button class="action-btn remembered" bindtap="onRemembered">记住了</button>
+      <button class="action-btn not-remembered" bindtap="onNotRemembered">没记住</button>
+    </view>
+  </view>
+</view>

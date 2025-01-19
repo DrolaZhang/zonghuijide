@@ -1,19 +1,23 @@
 interface IPageData {
   jsonName: string;
-  currentRow: string[];
+  rememberRow: string[];
+  rememberedRow: string[];
   total: number;
   countdown: number;
   timer?: number;
   rememberedCount: number;
+  activeTab: string;
 }
 
 Page<IPageData>({
   data: {
     jsonName: '',
-    currentRow: [],
+    rememberRow: [],
+    rememberedRow: [],
     total: 0,
     countdown: 10,
-    rememberedCount: 0
+    rememberedCount: 0,
+    activeTab: 'learning'
   },
 
   onLoad(options: Record<string, string>) {
@@ -30,9 +34,11 @@ Page<IPageData>({
           total: jsonData.total,
           rememberedCount: rememberedData.length
         });
-        this.showRandomRow();
+        this.showNextRow();
         this.startTimer();
       }
+      console.log(jsonData)
+      console.log(rememberedData)
     }
   },
 
@@ -60,7 +66,7 @@ Page<IPageData>({
       
       if (countdown <= 0) {
         // 倒计时结束，显示新数据
-        this.showRandomRow();
+        this.showNextRow();
         this.setData({ countdown: 10 });
       } else {
         // 更新倒计时
@@ -72,7 +78,7 @@ Page<IPageData>({
     this.setData({ timer });
   },
 
-  showRandomRow() {
+  showNextRow() {
     const jsonData = wx.getStorageSync(this.data.jsonName);
     const rememberedData = wx.getStorageSync(`${this.data.jsonName}_remembered`) || [];
     
@@ -97,13 +103,18 @@ Page<IPageData>({
       }
 
       const randomIndex = Math.floor(Math.random() * availableRows.length);
+      const randomIndexOfRememberd = Math.floor(Math.random() * rememberedData.length);
       const row = availableRows[randomIndex];
       
       // 将对象的值转换为字符串数组
       const rowContent = Object.values(row).map(value => String(value));
+      const rememberedRow = Object.values(rememberedData[randomIndexOfRememberd]).map(value => String(value));
       this.setData({
-        currentRow: rowContent
+        rememberRow: rowContent,
+        rememberedRow: rememberedRow
       });
+      console.log(this.data.rememberRow)
+      console.log(rememberedData)
     }
   },
 
@@ -112,7 +123,7 @@ Page<IPageData>({
     const rememberedData = wx.getStorageSync(`${this.data.jsonName}_remembered`) || [];
     
     // 找到当前显示的行
-    const currentRowStr = this.data.currentRow.join('');
+    const currentRowStr = this.data.rememberRow.join('');
     const currentRowData = jsonData.rows.find(row => 
       Object.values(row).join('') === currentRowStr
     );
@@ -125,13 +136,13 @@ Page<IPageData>({
       this.setData({ rememberedCount: rememberedData.length });
       
       // 显示下一行
-      this.showRandomRow();
+      this.showNextRow();
       this.startTimer();
     }
   },
 
   onNotRemembered() {
-    this.showRandomRow();
+    this.showNextRow();
     this.startTimer();
   },
 
@@ -174,5 +185,10 @@ Page<IPageData>({
         }
       }
     });
+  },
+
+  switchTab(e: any) {
+    const tab = e.currentTarget.dataset.tab;
+    this.setData({ activeTab: tab });
   }
 }); 
