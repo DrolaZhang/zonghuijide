@@ -85,7 +85,7 @@ Page<IPageData>({
   async chooseFile() {
     wx.chooseMessageFile({
       count: 1,
-      type: 'file',
+      type: 'all',
       extension: ['.xlsx', '.xls'],
       success: async (res) => {
         const file = res.tempFiles[0];
