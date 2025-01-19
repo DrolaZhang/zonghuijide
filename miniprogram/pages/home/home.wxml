@@ -1,39 +1,45 @@
-<view class="container">
-  <view class="header" wx:if="{{!fileList.length}}">
-    <view class="title">总会记住</view>
-    <view class="subtitle">上传Excel开始你的记忆之旅</view>
-  </view>
-
-  <view class="fixed-upload {{fileList.length > 0 ? 'upload-shifted' : ''}}">
-    <view class="upload-btn" bindtap="chooseFile">
-      <view class="upload-icon">+</view>
-      <view class="upload-text">更多记忆</view>
+<scroll-view class="container" scroll-y>
+  <block wx:if="{{!fileList.length}}">
+    <view class="header">
+      <text class="title">总会记住</text>
+      <text class="subtitle">上传Excel开始你的记忆之旅</text>
     </view>
-  </view>
+  </block>
 
-  <view class="files-section {{fileList.length > 0 ? 'has-files' : ''}}">
-    <view class="file-grid">
-      <view 
-        class="file-btn" 
-        wx:for="{{fileList}}" 
-        wx:key="jsonPath"
-        bindtap="goToRandomView" 
-        bindlongpress="showDeleteConfirm"
-        data-file="{{item}}"
-      >
+  <block wx:if="{{fileList.length}}">
+    <view class="header">
+      <text class="title">我的记忆列表</text>
+    </view>
+  </block>
+
+  <view class="files-section {{!fileList.length ? 'empty' : ''}}">
+    <view class="file-list">
+      <view class="file-btn" 
+            wx:for="{{fileList}}" 
+            wx:key="jsonPath" 
+            bindtap="goToRandomView" 
+            bindlongpress="showDeleteConfirm"
+            data-file="{{item}}">
         <view class="file-content">
-          <text class="file-name">{{item.jsonName}}</text>
+          <text class="file-name">{{item.name}}</text>
           <view class="progress-container">
             <view class="progress-bar">
-              <view 
-                class="progress-fill"
-                style="width: {{(item.rememberedCount || 0) / item.data.total * 100}}%"
-              ></view>
+              <view class="progress-fill" style="width: {{item.rememberedCount || 0 / item.data.total * 100}}%"></view>
             </view>
-            <text class="progress-text">{{(item.rememberedCount || 0)}}/{{item.data.total}}</text>
+            <text class="progress-text">{{item.rememberedCount || 0}}/{{item.data.total}}</text>
           </view>
+        </view>
+      </view>
+
+      <!-- 上传按钮作为列表的一部分 -->
+      <view class="weui-uploader">
+        <view class="weui-uploader__bd">
+          <view class="weui-uploader__input-box" bindtap="chooseFile"></view>
         </view>
       </view>
     </view>
   </view>
-</view> 
+</scroll-view>
+
+
+
