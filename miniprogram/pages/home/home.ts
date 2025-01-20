@@ -173,8 +173,7 @@ Page<IPageData>({
         const rememberedCount = Array.isArray(rememberedData.data) ? rememberedData.data.length : 0;
         
         console.log('File:', file.name, 'Total:', file.total, 'Remembered:', rememberedCount); // 调试日志
-        console.log(remainingData)
-        console.log(rememberedData)
+
         return {
           ...file,
           rememberedCount: rememberedCount

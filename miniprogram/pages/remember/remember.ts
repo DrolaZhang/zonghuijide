@@ -72,8 +72,7 @@ Page<IPageData>({
     });
     const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
     const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
-    console.log(remainingData)
-    console.log(rememberedData)
+
     if (this.data.activeTab === 'learning') {
 
       if (remainingData && remainingData.data.length > 0) {
@@ -93,8 +92,10 @@ Page<IPageData>({
         const randomIndex = Math.floor(Math.random() * availableRows.length);
 
         const row = availableRows[randomIndex];
+        // rowcontent should not include index
+        const rowContent = Object.values(row).filter(value => value !== row.index).map(value => String(value)); 
 
-        const rowContent = Object.values(row).map(value => String(value));
+        // const rowContent = Object.values(row).map(value => String(value));
 
         this.setData({
           currentRow: rowContent,
@@ -103,13 +104,11 @@ Page<IPageData>({
       }
     }
     else {
-
       if (rememberedData && rememberedData.data.length > 0) {
         const availableRows = rememberedData.data;
-
         const randomIndex = Math.floor(Math.random() * availableRows.length);
         const row = availableRows[randomIndex];
-        const rowContent = Object.values(row).map(value => String(value));
+        const rowContent = Object.values(row).filter(value => value !== row.index).map(value => String(value)); 
         this.setData({
           currentRow: rowContent,
           row: row
