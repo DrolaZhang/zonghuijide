@@ -1,45 +1,32 @@
 interface IPageData {
-  jsonName: string;
-  rememberRow: string[];
-  rememberedRow: string[];
+  name: string;
   total: number;
   countdown: number;
   timer?: number;
-  rememberedCount: number;
   activeTab: string;
+  currentRow: any;
+  row: any;
 }
 
 Page<IPageData>({
   data: {
-    jsonName: '',
-    rememberRow: [],
-    rememberedRow: [],
+    name: '',
     total: 0,
     countdown: 10,
-    rememberedCount: 0,
-    activeTab: 'learning'
+    activeTab: 'learning',
+    currentRow: null,
+    row: null
   },
 
   onLoad(options: Record<string, string>) {
-    if (options.jsonName) {
-      const jsonName = decodeURIComponent(options.jsonName);
-      this.setData({ jsonName });
-      
-      // 获取JSON数据和已记住的数据
-      const jsonData = wx.getStorageSync(jsonName);
-      const rememberedData = wx.getStorageSync(`${jsonName}_remembered`) || [];
-      
-      if (jsonData) {
-        this.setData({ 
-          total: jsonData.total,
-          rememberedCount: rememberedData.length
-        });
-        this.showNextRow();
-        this.startTimer();
-      }
-      console.log(jsonData)
-      console.log(rememberedData)
+
+    if (options.name) {
+      const name = decodeURIComponent(options.name);
+      this.setData({ name });
+      this.showNextRow();
+      this.startTimer();
     }
+
   },
 
   onUnload() {
@@ -56,14 +43,14 @@ Page<IPageData>({
   startTimer() {
     // 清除可能存在的旧定时器
     this.clearTimer();
-    
+
     // 重置倒计时
     this.setData({ countdown: 10 });
-    
+
     // 创建新的定时器
     const timer = setInterval(() => {
       const countdown = this.data.countdown - 1;
-      
+
       if (countdown <= 0) {
         // 倒计时结束，显示新数据
         this.showNextRow();
@@ -79,69 +66,100 @@ Page<IPageData>({
   },
 
   showNextRow() {
-    const jsonData = wx.getStorageSync(this.data.jsonName);
-    const rememberedData = wx.getStorageSync(`${this.data.jsonName}_remembered`) || [];
-    
-    if (jsonData && jsonData.rows.length > 0) {
-      // 过滤掉已记住的行
-      const availableRows = jsonData.rows.filter(row => 
-        !rememberedData.some((remembered: any) => 
-          JSON.stringify(row) === JSON.stringify(remembered)
-        )
-      );
+    this.setData({
+      currentRow: [],
+      row: null
+    });
+    const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
+    const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
+    console.log(remainingData)
+    console.log(rememberedData)
+    if (this.data.activeTab === 'learning') {
 
-      if (availableRows.length === 0) {
-        wx.showModal({
-          title: '恭喜',
-          content: '你已经记住了所有的内容！',
-          showCancel: false,
-          success: () => {
-            wx.navigateBack();
-          }
+      if (remainingData && remainingData.data.length > 0) {
+        const availableRows = remainingData.data;
+        if (availableRows.length === 0) {
+          wx.showModal({
+            title: '恭喜',
+            content: '你已经记住了所有的内容！',
+            showCancel: false,
+            success: () => {
+              wx.navigateBack();
+            }
+          });
+          return;
+        }
+
+        const randomIndex = Math.floor(Math.random() * availableRows.length);
+
+        const row = availableRows[randomIndex];
+
+        const rowContent = Object.values(row).map(value => String(value));
+
+        this.setData({
+          currentRow: rowContent,
+          row: row
         });
-        return;
       }
+    }
+    else {
 
-      const randomIndex = Math.floor(Math.random() * availableRows.length);
-      const randomIndexOfRememberd = Math.floor(Math.random() * rememberedData.length);
-      const row = availableRows[randomIndex];
-      
-      // 将对象的值转换为字符串数组
-      const rowContent = Object.values(row).map(value => String(value));
-      const rememberedRow = Object.values(rememberedData[randomIndexOfRememberd]).map(value => String(value));
-      this.setData({
-        rememberRow: rowContent,
-        rememberedRow: rememberedRow
-      });
-      console.log(this.data.rememberRow)
-      console.log(rememberedData)
+      if (rememberedData && rememberedData.data.length > 0) {
+        const availableRows = rememberedData.data;
+
+        const randomIndex = Math.floor(Math.random() * availableRows.length);
+        const row = availableRows[randomIndex];
+        const rowContent = Object.values(row).map(value => String(value));
+        this.setData({
+          currentRow: rowContent,
+          row: row
+        });
+      }
     }
   },
 
   onRemembered() {
-    const jsonData = wx.getStorageSync(this.data.jsonName);
-    const rememberedData = wx.getStorageSync(`${this.data.jsonName}_remembered`) || [];
-    
-    // 找到当前显示的行
-    const currentRowStr = this.data.rememberRow.join('');
-    const currentRowData = jsonData.rows.find(row => 
-      Object.values(row).join('') === currentRowStr
-    );
-
-    if (currentRowData) {
-      // 添加到已记住列表
-      rememberedData.push(currentRowData);
-      wx.setStorageSync(`${this.data.jsonName}_remembered`, rememberedData);
-      
-      this.setData({ rememberedCount: rememberedData.length });
-      
-      // 显示下一行
-      this.showNextRow();
-      this.startTimer();
+    const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
+    const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
+    // if remaining data is null, then isInRemaining is false 
+    const isInRemaining = remainingData ? remainingData.data.find(row =>
+      row.index === this.data.row.index
+    ) : false;
+    if (isInRemaining) {
+      remainingData.data = remainingData.data.filter(row => row.index !== this.data.row.index);
+      wx.setStorageSync(`${this.data.name}_remaining`, remainingData);
     }
+    // 如果当前行不在rememberedData列表中，则添加
+    const isAlreadyRemembered = rememberedData ? rememberedData.data.find(row =>
+      row.index === this.data.row.index) : false;
+    if (!isAlreadyRemembered) {
+      rememberedData.data.push(this.data.row);
+      wx.setStorageSync(`${this.data.name}_remembered`, rememberedData);
+    }
+
+    this.showNextRow();
+    this.startTimer();
+
   },
 
   onNotRemembered() {
+    const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
+    const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
+
+    const isInRemaining = remainingData.data.find(row =>
+      row.index === this.data.row.index
+    );
+    if (!isInRemaining) {
+      remainingData.data.push(this.data.row)
+      wx.setStorageSync(`${this.data.name}_remaining`, remainingData);
+    }
+    // 如果当前行不在rememberedData列表中，则添加
+    const isAlreadyRemembered = rememberedData ? rememberedData.data.find(row =>
+      row.index === this.data.row.index) : false;
+    if (isAlreadyRemembered) {
+      rememberedData.data = rememberedData.data.filter(row => row.index !== this.data.row.index);
+      wx.setStorageSync(`${this.data.name}_remembered`, rememberedData);
+    }
     this.showNextRow();
     this.startTimer();
   },
@@ -149,23 +167,23 @@ Page<IPageData>({
   deleteFile() {
     wx.showModal({
       title: '确认删除',
-      content: `是否删除文件 ${this.data.jsonName}？`,
+      content: `是否删除文件 ${this.data.name}？`,
       success: (res) => {
         if (res.confirm) {
           try {
             // 清除定时器
             this.clearTimer();
-            
+
             // 删除本地存储的JSON数据
-            wx.removeStorageSync(this.data.jsonName);
-            
+            wx.removeStorageSync(this.data.name);
+
             // 获取并更新文件列表
             const fileList = wx.getStorageSync('excelFiles') || [];
             const updatedFileList = fileList.filter(
-              (item: any) => item.jsonName !== this.data.jsonName
+              (item: any) => item.name !== this.data.name
             );
             wx.setStorageSync('excelFiles', updatedFileList);
-            
+
             // 返回上一页
             wx.navigateBack({
               success: () => {
@@ -190,5 +208,9 @@ Page<IPageData>({
   switchTab(e: any) {
     const tab = e.currentTarget.dataset.tab;
     this.setData({ activeTab: tab });
+    this.showNextRow();
+    this.startTimer();
   }
+
+
 }); 

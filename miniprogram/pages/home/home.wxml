@@ -16,18 +16,18 @@
     <view class="file-list">
       <view class="file-btn" 
             wx:for="{{fileList}}" 
-            wx:key="jsonPath" 
-            bindtap="goToRandomView" 
+            wx:key="name" 
+            bindtap="goToRememberPage" 
             bindlongpress="showDeleteConfirm"
             data-file="{{item}}">
         <view class="file-content">
           <text class="file-name">{{item.name}}</text>
           <view class="progress-container">
             <view class="progress-bar">
-              <view class="progress-fill" style="width: {{(item.rememberedCount || 0) / item.data.total * 100}}%">
+              <view class="progress-fill" style="width: {{(item.rememberedCount || 0) / item.total * 100}}%">
               </view>
             </view>
-            <text class="progress-text">{{item.rememberedCount || 0}}/{{item.data.total}}</text>
+            <text class="progress-text">{{item.rememberedCount || 0}}/{{item.total}}</text>
           </view>
         </view>
       </view>
