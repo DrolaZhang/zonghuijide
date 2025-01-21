@@ -126,6 +126,11 @@ Page<IPageData>({
     }
   },
 
+  onShortPress() {
+    this.showNextRow();
+    this.startTimer();
+  },
+
   onRemembered() {
     const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
     const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);

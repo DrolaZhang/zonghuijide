@@ -1,4 +1,4 @@
-<view class="container" bindlongpress="onLongPress">
+<view class="container" bindlongpress="onLongPress" bindtap="onShortPress">
   <view class="weui-tabs">
     <view class="weui-tabs-bar__wrp">
       <view class="weui-tabs-bar">
