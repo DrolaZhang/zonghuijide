@@ -127,4 +127,88 @@
   height: 4rpx;
   background: #07c160;
   border-radius: 2rpx;
+}
+
+.press-feedback {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 16rpx;
+  padding: 30rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1001;
+}
+
+.press-feedback.show {
+  animation: feedbackFlyRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes feedbackFlyRight {
+  0% {
+    opacity: 0;
+    transform: translate(-100%, -50%) scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(100%, -50%) scale(0.8);
+  }
+}
+
+@keyframes feedbackFlyLeft {
+  0% {
+    opacity: 0;
+    transform: translate(100%, -50%) scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-200%, -50%) scale(0.8);
+  }
+}
+
+.press-indicator {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  border: 4rpx solid #fff;
+  margin-bottom: 20rpx;
+  position: relative;
+}
+
+.press-indicator::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40rpx;
+  height: 40rpx;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.press-feedback text {
+  color: #fff;
+  font-size: 28rpx;
 } 
+
+.press-feedback.show-right {
+  animation: feedbackFlyRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.press-feedback.show-left {
+  animation: feedbackFlyLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}

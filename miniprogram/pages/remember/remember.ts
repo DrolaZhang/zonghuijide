@@ -15,7 +15,10 @@ Page<IPageData>({
     countdown: 10,
     activeTab: 'learning',
     currentRow: null,
-    row: null
+    row: null,
+    isPressing: false,
+    text: '',
+    flyDirection: 'right',
   },
 
   onLoad(options: Record<string, string>) {
@@ -118,12 +121,19 @@ Page<IPageData>({
   },
 
   onLongPress() {
+    const direction = this.data.activeTab === 'learning' ? 'right' : 'left';
+    this.setData({ isPressing: true, flyDirection: direction });
     if(this.data.activeTab === 'learning') {
       this.onRemembered();
+      this.setData({ text: '记住了' });
     }
     else {
       this.onNotRemembered();
+      this.setData({ text: '没记住' });
     }
+    setTimeout(() => {
+      this.setData({ isPressing: false });
+    }, 800); 
   },
 
   onShortPress() {
