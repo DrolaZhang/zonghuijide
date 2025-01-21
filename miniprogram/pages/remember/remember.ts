@@ -117,6 +117,15 @@ Page<IPageData>({
     }
   },
 
+  onLongPress() {
+    if(this.data.activeTab === 'learning') {
+      this.onRemembered();
+    }
+    else {
+      this.onNotRemembered();
+    }
+  },
+
   onRemembered() {
     const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
     const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);

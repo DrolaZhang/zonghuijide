@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container" bindlongpress="onLongPress">
   <view class="weui-tabs">
     <view class="weui-tabs-bar__wrp">
       <view class="weui-tabs-bar">
@@ -12,21 +12,20 @@
     </view>
   </view>
 
-  <view>
-    <view class="content" wx:if="{{currentRow.length > 0}}">
-      <view class="row-data">
-        <view wx:for="{{currentRow}}" wx:key="index" class="row-item">
-          {{item}}
-        </view>
+
+  <view class="content" wx:if="{{currentRow.length > 0}}">
+    <view class="row-data">
+      <view wx:for="{{currentRow}}" wx:key="index" class="row-item">
+        {{item}}
       </view>
-      <view class="timer">{{countdown}}s 后更新</view>
     </view>
-
-    <view class="button-group">
-      <button class="action-btn remembered" bindtap="onRemembered">记住了</button>
-      <button class="action-btn not-remembered" bindtap="onNotRemembered">没记住</button>
-    </view>
-
+    <view class="timer">{{countdown}}s 后更新</view>
   </view>
-  
+  <view class="button-group">
+    <button class="action-btn remembered" bindtap="onRemembered">记住了</button>
+    <button class="action-btn not-remembered" bindtap="onNotRemembered">没记住</button>
+  </view>
+
+
+
 </view>

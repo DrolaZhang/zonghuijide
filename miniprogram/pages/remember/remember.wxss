@@ -2,46 +2,10 @@
   padding: 20rpx;
 }
 
-.header {
-  padding: 20rpx 0;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 30rpx;
-}
-
-.title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20rpx;
-}
-
-.progress-container {
-  margin-top: 20rpx;
-}
-
-.progress-bar {
-  height: 6rpx;
-  background: #f0f0f0;
-  border-radius: 3rpx;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: #007AFF;
-  transition: width 0.3s ease;
-}
-
-.progress-text {
-  font-size: 24rpx;
-  color: #666;
-  margin-top: 10rpx;
-  display: block;
-  text-align: center;
-}
 
 .content {
   margin-bottom: 40rpx;
+  
 }
 
 .row-data {
@@ -71,7 +35,6 @@
 .button-group {
   display: flex;
   gap: 20rpx;
-  margin-top: 40rpx;
 }
 
 .action-btn {
@@ -92,21 +55,7 @@
   color: #666;
 }
 
-.delete-btn {
-  width: 60rpx;
-  height: 60rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 59, 48, 0.1);
-  border-radius: 30rpx;
-}
 
-.delete-icon {
-  color: #FF3B30;
-  font-size: 40rpx;
-  font-weight: bold;
-}
 
 /* 只添加 tabs 相关样式 */
 .weui-tabs {
