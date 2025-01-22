@@ -134,15 +134,17 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 16rpx;
+  background: rgba(52, 199, 89, 0.95);
+  border-radius: 8rpx;
   padding: 30rpx 40rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   opacity: 0;
   pointer-events: none;
   z-index: 1001;
+  min-width: 200rpx;
+  max-width: 80%;
+  transform-origin: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #34C759;
 }
 
 .press-feedback.show {
@@ -160,7 +162,7 @@
   }
   100% {
     opacity: 0;
-    transform: translate(100%, -50%) scale(0.8);
+    transform: translate(300%, -50%) scale(0.8);
   }
 }
 
@@ -175,29 +177,8 @@
   }
   100% {
     opacity: 0;
-    transform: translate(-200%, -50%) scale(0.8);
+    transform: translate(-300%, -50%) scale(0.8);
   }
-}
-
-.press-indicator {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  border: 4rpx solid #fff;
-  margin-bottom: 20rpx;
-  position: relative;
-}
-
-.press-indicator::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 40rpx;
-  height: 40rpx;
-  background: #fff;
-  border-radius: 50%;
 }
 
 .press-feedback text {
