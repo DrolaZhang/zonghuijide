@@ -6,6 +6,7 @@ interface IPageData {
   activeTab: string;
   currentRow: any;
   row: any;
+  timerInterval: number;
 }
 
 Page<IPageData>({
@@ -20,7 +21,11 @@ Page<IPageData>({
     text: '',
     flyDirection: 'right',
     remainingCount: null,
-    rememberedCount: null
+    rememberedCount: null,
+    showFeedback: '',
+    startX: 0,
+    isSettingsOpen: false,
+    timerInterval: 5, // 默认5秒
   },
 
   onLoad(options: Record<string, string>) {
@@ -32,6 +37,13 @@ Page<IPageData>({
       this.startTimer();
     }
 
+    // 从本地存储读取上次设置的时间
+    const savedInterval = wx.getStorageSync('timerInterval');
+    if (savedInterval) {
+      this.setData({
+        timerInterval: savedInterval
+      });
+    }
   },
 
   onUnload() {
@@ -49,8 +61,7 @@ Page<IPageData>({
     // 清除可能存在的旧定时器
     this.clearTimer();
 
-    // 重置倒计时
-    this.setData({ countdown: 10 });
+    this.setData({ countdown: this.data.timerInterval });
 
     // 创建新的定时器
     const timer = setInterval(() => {
@@ -59,7 +70,8 @@ Page<IPageData>({
       if (countdown <= 0) {
         // 倒计时结束，显示新数据
         this.showNextRow();
-        this.setData({ countdown: 10 });
+        this.setData({ countdown: this.data.timerInterval });
+
       } else {
         // 更新倒计时
         this.setData({ countdown });
@@ -240,7 +252,63 @@ Page<IPageData>({
     this.setData({ activeTab: tab });
     this.showNextRow();
     this.startTimer();
-  }
+  },
 
+  // 切换设置菜单
+  toggleSettings() {
+    this.setData({
+      isSettingsOpen: !this.data.isSettingsOpen
+    });
+  },
 
+  // 点击页面其他区域关闭菜单
+  onTapPage() {
+    if (this.data.isSettingsOpen) {
+      this.setData({
+        isSettingsOpen: false
+      });
+    }
+  },
+
+  // 现有的触摸处理函数保持不变
+  handleTouchStart(e: WechatMiniprogram.TouchEvent) {
+    this.data.startX = e.touches[0].clientX;
+  },
+
+  handleTouchEnd(e: WechatMiniprogram.TouchEvent) {
+    const SWIPE_THRESHOLD = 50;
+    const endX = e.changedTouches[0].clientX;
+    const deltaX = endX - this.data.startX;
+
+    if (deltaX > SWIPE_THRESHOLD) {
+      this.setData({ showFeedback: 'show-right' });
+      setTimeout(() => {
+        this.setData({ showFeedback: '' });
+      }, 1200);
+    } 
+    else if (deltaX < -SWIPE_THRESHOLD) {
+      this.setData({ showFeedback: 'show-left' });
+      setTimeout(() => {
+        this.setData({ showFeedback: '' });
+      }, 1200);
+    }
+  },
+
+  // 时间轴改变事件
+  onTimerChange(e: WechatMiniprogram.SliderChange) {
+    const newInterval = e.detail.value;
+    this.setData({
+      timerInterval: newInterval
+    });
+    // 保存到本地存储
+    wx.setStorageSync('timerInterval', newInterval);
+    // 触发定时器更新
+    this.updateTimer();
+  },
+
+  // 更新定时器
+  updateTimer() {
+    // TODO: 实现定时器更新逻辑
+    console.log(`Timer updated to ${this.data.timerInterval} seconds`);
+  },
 }); 

@@ -1,4 +1,9 @@
-<view class="container" bindlongpress="onLongPress" bindtap="onShortPress">
+<view class="container" 
+      bind:touchstart="gestureHandler"
+      bind:touchmove="gestureHandler"
+      bind:touchend="gestureHandler"
+      bind:touchcancel="gestureHandler"
+      bindlongpress="onLongPress" bindtap="onShortPress">
   <view class="weui-tabs">
     <view class="weui-tabs-bar__wrp">
       <view class="weui-tabs-bar">
@@ -12,9 +17,7 @@
     </view>
   </view>
 
-  <view class="press-feedback {{isPressing ? 'show-' + flyDirection : ''}}">
-     {{text}}
-  </view>
+  <view class="press-feedback {{showFeedback}}"></view>
 
   <view class="content" wx:if="{{currentRow.length > 0}}">
     <view class="row-data">
@@ -25,5 +28,33 @@
     <view class="timer">{{countdown}}s 后更新</view>
   </view>
 
+  <!-- 设置按钮和菜单 -->
+  <view class="settings-container" catchtap="toggleSettings">
+    <view class="settings-button">
+      <text>设置</text>
+    </view>
+    
+    <!-- 展开菜单 -->
+    <view class="settings-menu {{isSettingsOpen ? 'open' : ''}}">
+      <view class="menu-item timer-setting">
+        <view class="timer-header">
+          <text>自动更新时间</text>
+          <text class="timer-value">{{timerInterval}}秒</text>
+        </view>
+        <slider 
+          min="1" 
+          max="30" 
+          step="1" 
+          value="{{timerInterval}}" 
+          block-size="20" 
+          activeColor="#34C759"
+          backgroundColor="#eee"
+          bindchange="onTimerChange"
+        />
+      </view>
+      <view class="menu-item">设置项 2</view>
+      <view class="menu-item">设置项 3</view>
+    </view>
+  </view>
 
 </view>
