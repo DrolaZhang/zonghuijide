@@ -19,6 +19,8 @@ Page<IPageData>({
     isPressing: false,
     text: '',
     flyDirection: 'right',
+    remainingCount: null,
+    rememberedCount: null
   },
 
   onLoad(options: Record<string, string>) {
@@ -75,7 +77,12 @@ Page<IPageData>({
     });
     const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
     const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
-
+    if (remainingData && rememberedData) {
+      this.setData({
+        remainingCount: remainingData.data.length,
+        rememberedCount: rememberedData.data.length
+      })
+    }
     if (this.data.activeTab === 'learning') {
 
       if (remainingData && remainingData.data.length > 0) {

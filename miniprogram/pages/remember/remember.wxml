@@ -3,10 +3,10 @@
     <view class="weui-tabs-bar__wrp">
       <view class="weui-tabs-bar">
         <view class="weui-tabs-bar__item {{activeTab === 'learning' ? 'weui-tabs-bar__item_on' : ''}}" bindtap="switchTab" data-tab="learning">
-          <view class="weui-tabs-bar__title">记忆中</view>
+          <view class="weui-tabs-bar__title">记忆中 {{remainingCount}}</view>
         </view>
         <view class="weui-tabs-bar__item {{activeTab === 'remembered' ? 'weui-tabs-bar__item_on' : ''}}" bindtap="switchTab" data-tab="remembered">
-          <view class="weui-tabs-bar__title">已记住</view>
+          <view class="weui-tabs-bar__title">已记住 {{rememberedCount}}</view>
         </view>
       </view>
     </view>
