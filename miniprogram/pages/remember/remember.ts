@@ -183,19 +183,15 @@ Page<IPageData>({
   },
 
   onRemembered() {
-    const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
-    const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
-    // if remaining data is null, then isInRemaining is false 
 
     if (this.data.activeTab === 'learning') {
+      const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
+      const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
       remainingData.data = remainingData.data.filter(row => row.index !== this.data.row.index);
       wx.setStorageSync(`${this.data.name}_remaining`, remainingData);
       rememberedData.data.push(this.data.row);
       wx.setStorageSync(`${this.data.name}_remembered`, rememberedData);
     }
-
-
-
 
     this.showNextRow();
     this.startTimer();
@@ -203,16 +199,16 @@ Page<IPageData>({
   },
 
   onNotRemembered() {
-    const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
-    const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
 
     if (this.data.activeTab === 'remembered') {
+      const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
+      const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
       rememberedData.data = rememberedData.data.filter(row => row.index !== this.data.row.index);
       wx.setStorageSync(`${this.data.name}_remembered`, rememberedData);
       remainingData.data.push(this.data.row)
       wx.setStorageSync(`${this.data.name}_remaining`, remainingData);
     }
-    
+
     this.showNextRow();
     this.startTimer();
   },
