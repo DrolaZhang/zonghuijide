@@ -13,8 +13,7 @@
   </view>
 
   <view class="press-feedback {{isPressing ? 'show-' + flyDirection : ''}}">
-    
-    <text>{{currentRow}}</text>
+     {{text}}
   </view>
 
   <view class="content" wx:if="{{currentRow.length > 0}}">
@@ -25,9 +24,6 @@
     </view>
     <view class="timer">{{countdown}}s 后更新</view>
   </view>
-  <view class="button-group">
-    <button class="action-btn remembered" bindtap="onRemembered">记住了</button>
-    <button class="action-btn not-remembered" bindtap="onNotRemembered">没记住</button>
-  </view>
+
 
 </view>

@@ -132,11 +132,11 @@ Page<IPageData>({
     this.setData({ isPressing: true, flyDirection: direction });
     if(this.data.activeTab === 'learning') {
       this.onRemembered();
-      this.setData({ text: '记住了' });
+      this.setData({ text: '已标记为已记住' });
     }
     else {
       this.onNotRemembered();
-      this.setData({ text: '没记住' });
+      this.setData({ text: '已标记为没记住' });
     }
     setTimeout(() => {
       this.setData({ isPressing: false });
