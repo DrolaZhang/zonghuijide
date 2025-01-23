@@ -1,8 +1,4 @@
 <view class="container" 
-      bind:touchstart="gestureHandler"
-      bind:touchmove="gestureHandler"
-      bind:touchend="gestureHandler"
-      bind:touchcancel="gestureHandler"
       bindlongpress="onLongPress" bindtap="onShortPress">
   <view class="weui-tabs">
     <view class="weui-tabs-bar__wrp">
@@ -17,7 +13,9 @@
     </view>
   </view>
 
-  <view class="press-feedback {{showFeedback}}"></view>
+  <view class="press-feedback {{isPressing ? 'show-' + flyDirection : ''}}">
+     {{text}}
+  </view>
 
   <view class="content" wx:if="{{currentRow.length > 0}}">
     <view class="row-data">
@@ -52,7 +50,17 @@
           bindchange="onTimerChange"
         />
       </view>
-      <view class="menu-item">设置项 2</view>
+      <view class="menu-item mode-setting">
+        <text>播放模式</text>
+        <view class="mode-switch">
+          <view class="{{playMode === 'loop' ? 'mode-active' : ''}}" 
+                data-mode="loop" 
+                bindtap="onModeChange">循环</view>
+          <view class="{{playMode === 'random' ? 'mode-active' : ''}}" 
+                data-mode="random" 
+                bindtap="onModeChange">随机</view>
+        </view>
+      </view>
       <view class="menu-item">设置项 3</view>
     </view>
   </view>

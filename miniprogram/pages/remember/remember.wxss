@@ -274,3 +274,28 @@
   color: #666;
 }
 
+.mode-setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mode-switch {
+  display: flex;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.mode-switch view {
+  padding: 8rpx 24rpx;
+  font-size: 24rpx;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.mode-switch .mode-active {
+  background: #34C759;
+  color: #fff;
+}
+

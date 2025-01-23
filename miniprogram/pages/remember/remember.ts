@@ -7,6 +7,13 @@ interface IPageData {
   currentRow: any;
   row: any;
   timerInterval: number;
+  playMode: string;
+  isSettingsOpen: boolean;
+  isPressing: boolean;
+  text: string;
+  flyDirection: string;
+  remainingCount: number | null;
+  rememberedCount: number | null;
 }
 
 Page<IPageData>({
@@ -22,14 +29,12 @@ Page<IPageData>({
     flyDirection: 'right',
     remainingCount: null,
     rememberedCount: null,
-    showFeedback: '',
-    startX: 0,
     isSettingsOpen: false,
     timerInterval: 5, // 默认5秒
+    playMode: 'loop', // 默认循环模式
   },
 
   onLoad(options: Record<string, string>) {
-
     if (options.name) {
       const name = decodeURIComponent(options.name);
       this.setData({ name });
@@ -37,13 +42,14 @@ Page<IPageData>({
       this.startTimer();
     }
 
-    // 从本地存储读取上次设置的时间
+    // 读取本地存储的设置
     const savedInterval = wx.getStorageSync('timerInterval');
-    if (savedInterval) {
-      this.setData({
-        timerInterval: savedInterval
-      });
-    }
+    const savedMode = wx.getStorageSync('playMode');
+
+    this.setData({
+      timerInterval: savedInterval || 5,
+      playMode: savedMode || 'loop'
+    });
   },
 
   onUnload() {
@@ -83,10 +89,7 @@ Page<IPageData>({
   },
 
   showNextRow() {
-    this.setData({
-      currentRow: [],
-      row: null
-    });
+
     const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
     const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
     if (remainingData && rememberedData) {
@@ -96,7 +99,6 @@ Page<IPageData>({
       })
     }
     if (this.data.activeTab === 'learning') {
-
       if (remainingData && remainingData.data.length > 0) {
         const availableRows = remainingData.data;
         if (availableRows.length === 0) {
@@ -110,27 +112,66 @@ Page<IPageData>({
           });
           return;
         }
-
+        let nextIndex = 0
         const randomIndex = Math.floor(Math.random() * availableRows.length);
+        if (this.data.playMode === 'random') {
+          nextIndex = randomIndex
+        }
+        else {
+          nextIndex = this.data.row ? this.data.row.index + 1 : 0
+        }
 
-        const row = availableRows[randomIndex];
-        // rowcontent should not include index
-        const rowContent = Object.values(row).filter(value => value !== row.index).map(value => String(value)); 
+        this.setData({
+          currentRow: [],
+          row: null
+        });
 
-        // const rowContent = Object.values(row).map(value => String(value));
+        let row = availableRows.find(row => row.index === nextIndex);
 
+        if (!row) {
+          row = availableRows
+            .filter(row => row.index > nextIndex)
+            .sort((a, b) => a.index - b.index)[0];
+        }
+        const rowContent = Object.values(row).filter(value => value !== row.index).map(value => String(value));
         this.setData({
           currentRow: rowContent,
           row: row
         });
+        
       }
     }
     else {
       if (rememberedData && rememberedData.data.length > 0) {
         const availableRows = rememberedData.data;
+        if (availableRows.length === 0) {
+          wx.showModal({
+            title: '恭喜',
+            content: '你已经记住了所有的内容！',
+            showCancel: false,
+            success: () => {
+              wx.navigateBack();
+            }
+          });
+          return;
+        }
         const randomIndex = Math.floor(Math.random() * availableRows.length);
-        const row = availableRows[randomIndex];
-        const rowContent = Object.values(row).filter(value => value !== row.index).map(value => String(value)); 
+        let nextIndex = 0
+        if (this.data.playMode === 'random') {
+          nextIndex = randomIndex
+        }
+        else {
+          nextIndex = this.data.row ? this.data.row.index + 1 : 0
+        }
+        
+        let row = availableRows.find(row => row.index === nextIndex);
+
+        if (!row) {
+          row = availableRows
+            .filter(row => row.index > nextIndex)
+            .sort((a, b) => a.index - b.index)[0];
+        };
+        const rowContent = Object.values(row).filter(value => value !== row.index).map(value => String(value));
         this.setData({
           currentRow: rowContent,
           row: row
@@ -142,7 +183,7 @@ Page<IPageData>({
   onLongPress() {
     const direction = this.data.activeTab === 'learning' ? 'right' : 'left';
     this.setData({ isPressing: true, flyDirection: direction });
-    if(this.data.activeTab === 'learning') {
+    if (this.data.activeTab === 'learning') {
       this.onRemembered();
       this.setData({ text: '已标记为已记住' });
     }
@@ -152,7 +193,7 @@ Page<IPageData>({
     }
     setTimeout(() => {
       this.setData({ isPressing: false });
-    }, 800); 
+    }, 800);
   },
 
   onShortPress() {
@@ -270,29 +311,6 @@ Page<IPageData>({
     }
   },
 
-  // 现有的触摸处理函数保持不变
-  handleTouchStart(e: WechatMiniprogram.TouchEvent) {
-    this.data.startX = e.touches[0].clientX;
-  },
-
-  handleTouchEnd(e: WechatMiniprogram.TouchEvent) {
-    const SWIPE_THRESHOLD = 50;
-    const endX = e.changedTouches[0].clientX;
-    const deltaX = endX - this.data.startX;
-
-    if (deltaX > SWIPE_THRESHOLD) {
-      this.setData({ showFeedback: 'show-right' });
-      setTimeout(() => {
-        this.setData({ showFeedback: '' });
-      }, 1200);
-    } 
-    else if (deltaX < -SWIPE_THRESHOLD) {
-      this.setData({ showFeedback: 'show-left' });
-      setTimeout(() => {
-        this.setData({ showFeedback: '' });
-      }, 1200);
-    }
-  },
 
   // 时间轴改变事件
   onTimerChange(e: WechatMiniprogram.SliderChange) {
@@ -310,5 +328,14 @@ Page<IPageData>({
   updateTimer() {
     // TODO: 实现定时器更新逻辑
     console.log(`Timer updated to ${this.data.timerInterval} seconds`);
+  },
+
+  // 切换播放模式
+  onModeChange(e: WechatMiniprogram.TouchEvent) {
+    const mode = e.currentTarget.dataset.mode;
+    this.setData({ playMode: mode });
+    wx.setStorageSync('playMode', mode);
+    // TODO: 更新播放模式逻辑
+    console.log(`Play mode changed to: ${mode}`);
   },
 }); 
