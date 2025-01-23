@@ -100,7 +100,7 @@ Page<IPageData>({
     }
     let availableRows = []
     if (this.data.activeTab === 'learning') {
-      if (remainingData && remainingData.data.length > 0) {
+            if (remainingData && remainingData.data.length >= 0) {
         availableRows = remainingData.data;
         if (availableRows.length === 0) {
           wx.showModal({
@@ -116,7 +116,7 @@ Page<IPageData>({
       }
     }
     else {
-      if (rememberedData && rememberedData.data.length > 0) {
+      if (rememberedData && rememberedData.data.length >= 0) {
         availableRows = rememberedData.data;
         if (availableRows.length === 0) {
           wx.showModal({
