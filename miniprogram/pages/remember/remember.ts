@@ -199,6 +199,12 @@ Page<IPageData>({
   onShortPress() {
     this.showNextRow();
     this.startTimer();
+    if (this.data.isSettingsOpen) {
+      console.log('close settings')
+      this.setData({
+        isSettingsOpen: false
+      });
+    }
   },
 
   onRemembered() {
@@ -301,16 +307,6 @@ Page<IPageData>({
       isSettingsOpen: !this.data.isSettingsOpen
     });
   },
-
-  // 点击页面其他区域关闭菜单
-  onTapPage() {
-    if (this.data.isSettingsOpen) {
-      this.setData({
-        isSettingsOpen: false
-      });
-    }
-  },
-
 
   // 时间轴改变事件
   onTimerChange(e: WechatMiniprogram.SliderChange) {
