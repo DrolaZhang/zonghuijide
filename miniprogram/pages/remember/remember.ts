@@ -117,7 +117,7 @@ Page<IPageData>({
     }
     else {
       if (rememberedData && rememberedData.data.length > 0) {
-         availableRows = rememberedData.data;
+        availableRows = rememberedData.data;
         if (availableRows.length === 0) {
           wx.showModal({
             title: '恭喜',
@@ -157,156 +157,145 @@ Page<IPageData>({
   },
 
   onLongPress() {
-  const direction = this.data.activeTab === 'learning' ? 'right' : 'left';
-  this.setData({ isPressing: true, flyDirection: direction });
-  if(this.data.activeTab === 'learning') {
-  this.onRemembered();
-  this.setData({ text: '已标记为已记住' });
-}
+    const direction = this.data.activeTab === 'learning' ? 'right' : 'left';
+    this.setData({ isPressing: true, flyDirection: direction });
+    if (this.data.activeTab === 'learning') {
+      this.onRemembered();
+      this.setData({ text: '已标记为已记住' });
+    }
     else {
-  this.onNotRemembered();
-  this.setData({ text: '已标记为没记住' });
-}
-setTimeout(() => {
-  this.setData({ isPressing: false });
-}, 800);
+      this.onNotRemembered();
+      this.setData({ text: '已标记为没记住' });
+    }
+    setTimeout(() => {
+      this.setData({ isPressing: false });
+    }, 800);
   },
 
-onShortPress() {
-  this.showNextRow();
-  this.startTimer();
-  if (this.data.isSettingsOpen) {
-    this.setData({
-      isSettingsOpen: false
-    });
-  }
-},
+  onShortPress() {
+    this.showNextRow();
+    this.startTimer();
+    if (this.data.isSettingsOpen) {
+      this.setData({
+        isSettingsOpen: false
+      });
+    }
+  },
 
-onRemembered() {
-  const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
-  const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
-  // if remaining data is null, then isInRemaining is false 
-  const isInRemaining = remainingData ? remainingData.data.find(row =>
-    row.index === this.data.row.index
-  ) : false;
-  if (isInRemaining) {
-    remainingData.data = remainingData.data.filter(row => row.index !== this.data.row.index);
-    wx.setStorageSync(`${this.data.name}_remaining`, remainingData);
-  }
-  // 如果当前行不在rememberedData列表中，则添加
-  const isAlreadyRemembered = rememberedData ? rememberedData.data.find(row =>
-    row.index === this.data.row.index) : false;
-  if (!isAlreadyRemembered) {
-    rememberedData.data.push(this.data.row);
-    wx.setStorageSync(`${this.data.name}_remembered`, rememberedData);
-  }
+  onRemembered() {
+    const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
+    const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
+    // if remaining data is null, then isInRemaining is false 
 
-  this.showNextRow();
-  this.startTimer();
+    if (this.data.activeTab === 'learning') {
+      remainingData.data = remainingData.data.filter(row => row.index !== this.data.row.index);
+      wx.setStorageSync(`${this.data.name}_remaining`, remainingData);
+      rememberedData.data.push(this.data.row);
+      wx.setStorageSync(`${this.data.name}_remembered`, rememberedData);
+    }
 
-},
 
-onNotRemembered() {
-  const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
-  const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
 
-  const isInRemaining = remainingData.data.find(row =>
-    row.index === this.data.row.index
-  );
-  if (!isInRemaining) {
-    remainingData.data.push(this.data.row)
-    wx.setStorageSync(`${this.data.name}_remaining`, remainingData);
-  }
-  // 如果当前行不在rememberedData列表中，则添加
-  const isAlreadyRemembered = rememberedData ? rememberedData.data.find(row =>
-    row.index === this.data.row.index) : false;
-  if (isAlreadyRemembered) {
-    rememberedData.data = rememberedData.data.filter(row => row.index !== this.data.row.index);
-    wx.setStorageSync(`${this.data.name}_remembered`, rememberedData);
-  }
-  this.showNextRow();
-  this.startTimer();
-},
 
-deleteFile() {
-  wx.showModal({
-    title: '确认删除',
-    content: `是否删除文件 ${this.data.name}？`,
-    success: (res) => {
-      if (res.confirm) {
-        try {
-          // 清除定时器
-          this.clearTimer();
+    this.showNextRow();
+    this.startTimer();
 
-          // 删除本地存储的JSON数据
-          wx.removeStorageSync(this.data.name);
+  },
 
-          // 获取并更新文件列表
-          const fileList = wx.getStorageSync('excelFiles') || [];
-          const updatedFileList = fileList.filter(
-            (item: any) => item.name !== this.data.name
-          );
-          wx.setStorageSync('excelFiles', updatedFileList);
+  onNotRemembered() {
+    const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
+    const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
 
-          // 返回上一页
-          wx.navigateBack({
-            success: () => {
-              wx.showToast({
-                title: '删除成功',
-                icon: 'success'
-              });
-            }
-          });
-        } catch (error) {
-          console.error('删除文件失败：', error);
-          wx.showToast({
-            title: '删除失败',
-            icon: 'error'
-          });
+    if (this.data.activeTab === 'remembered') {
+      rememberedData.data = rememberedData.data.filter(row => row.index !== this.data.row.index);
+      wx.setStorageSync(`${this.data.name}_remembered`, rememberedData);
+      remainingData.data.push(this.data.row)
+      wx.setStorageSync(`${this.data.name}_remaining`, remainingData);
+    }
+    
+    this.showNextRow();
+    this.startTimer();
+  },
+
+  deleteFile() {
+    wx.showModal({
+      title: '确认删除',
+      content: `是否删除文件 ${this.data.name}？`,
+      success: (res) => {
+        if (res.confirm) {
+          try {
+            // 清除定时器
+            this.clearTimer();
+
+            // 删除本地存储的JSON数据
+            wx.removeStorageSync(this.data.name);
+
+            // 获取并更新文件列表
+            const fileList = wx.getStorageSync('excelFiles') || [];
+            const updatedFileList = fileList.filter(
+              (item: any) => item.name !== this.data.name
+            );
+            wx.setStorageSync('excelFiles', updatedFileList);
+
+            // 返回上一页
+            wx.navigateBack({
+              success: () => {
+                wx.showToast({
+                  title: '删除成功',
+                  icon: 'success'
+                });
+              }
+            });
+          } catch (error) {
+            console.error('删除文件失败：', error);
+            wx.showToast({
+              title: '删除失败',
+              icon: 'error'
+            });
+          }
         }
       }
-    }
-  });
-},
+    });
+  },
 
-switchTab(e: any) {
-  const tab = e.currentTarget.dataset.tab;
-  this.setData({ activeTab: tab });
-  this.showNextRow();
-  this.startTimer();
-},
+  switchTab(e: any) {
+    const tab = e.currentTarget.dataset.tab;
+    this.setData({ activeTab: tab });
+    this.showNextRow();
+    this.startTimer();
+  },
 
-// 切换设置菜单
-toggleSettings() {
-  this.setData({
-    isSettingsOpen: !this.data.isSettingsOpen
-  });
-},
+  // 切换设置菜单
+  toggleSettings() {
+    this.setData({
+      isSettingsOpen: !this.data.isSettingsOpen
+    });
+  },
 
-// 时间轴改变事件
-onTimerChange(e: WechatMiniprogram.SliderChange) {
-  const newInterval = e.detail.value;
-  this.setData({
-    timerInterval: newInterval
-  });
-  // 保存到本地存储
-  wx.setStorageSync('timerInterval', newInterval);
-  // 触发定时器更新
-  this.updateTimer();
-},
+  // 时间轴改变事件
+  onTimerChange(e: WechatMiniprogram.SliderChange) {
+    const newInterval = e.detail.value;
+    this.setData({
+      timerInterval: newInterval
+    });
+    // 保存到本地存储
+    wx.setStorageSync('timerInterval', newInterval);
+    // 触发定时器更新
+    this.updateTimer();
+  },
 
-// 更新定时器
-updateTimer() {
-  // TODO: 实现定时器更新逻辑
-  console.log(`Timer updated to ${this.data.timerInterval} seconds`);
-},
+  // 更新定时器
+  updateTimer() {
+    // TODO: 实现定时器更新逻辑
+    console.log(`Timer updated to ${this.data.timerInterval} seconds`);
+  },
 
-// 切换播放模式
-onModeChange(e: WechatMiniprogram.TouchEvent) {
-  const mode = e.currentTarget.dataset.mode;
-  this.setData({ playMode: mode });
-  wx.setStorageSync('playMode', mode);
-  // TODO: 更新播放模式逻辑
-  console.log(`Play mode changed to: ${mode}`);
-},
+  // 切换播放模式
+  onModeChange(e: WechatMiniprogram.TouchEvent) {
+    const mode = e.currentTarget.dataset.mode;
+    this.setData({ playMode: mode });
+    wx.setStorageSync('playMode', mode);
+    // TODO: 更新播放模式逻辑
+    console.log(`Play mode changed to: ${mode}`);
+  },
 }); 
