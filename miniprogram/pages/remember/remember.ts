@@ -14,6 +14,7 @@ interface IPageData {
   flyDirection: string;
   remainingCount: number | null;
   rememberedCount: number | null;
+  totalCount: number;
   showFeedback: string;
   startX: number;
   fontSize: number;
@@ -32,6 +33,7 @@ Page<IPageData>({
     flyDirection: 'right',
     remainingCount: null,
     rememberedCount: null,
+    totalCount: null,
     isSettingsOpen: false,
     timerInterval: 5, // 默认5秒
     playMode: 'loop', // 默认循环模式
@@ -52,6 +54,13 @@ Page<IPageData>({
     const savedInterval = wx.getStorageSync('timerInterval');
     const savedMode = wx.getStorageSync('playMode');
     const savedFontSize = wx.getStorageSync('fontSize');
+    const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
+    const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
+    if (remainingData && rememberedData) {
+      this.setData({
+        totalCount: remainingData.data.length + rememberedData.data.length
+      })
+    }
     
     this.setData({
       timerInterval: savedInterval || 5,
@@ -150,13 +159,14 @@ Page<IPageData>({
       }
     }
     const randomIndex = Math.floor(Math.random() * availableRows.length);
+    console.log(availableRows);
     let nextIndex = 0
     if (this.data.playMode === 'random') {
-      nextIndex = randomIndex
+      nextIndex = availableRows[randomIndex].index
     }
     else {
       nextIndex = this.data.row ? this.data.row.index + 1 : 0
-      if (nextIndex >= availableRows.length) {
+      if (nextIndex >= rememberedData.data.length + remainingData.data.length) {
         nextIndex = 0;
       }
     }
