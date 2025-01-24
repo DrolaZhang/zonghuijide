@@ -108,7 +108,7 @@ Page<IPageData>({
     }
     let availableRows = []
     if (this.data.activeTab === 'learning') {
-            if (remainingData && remainingData.data.length >= 0) {
+      if (remainingData && remainingData.data.length >= 0) {
         availableRows = remainingData.data;
         if (availableRows.length === 0) {
           wx.showModal({
@@ -116,7 +116,12 @@ Page<IPageData>({
             content: '你已经记住了所有的内容！',
             showCancel: false,
             success: () => {
-              wx.navigateBack();
+              if (rememberedData && rememberedData.data.length > 0) {
+                this.setData({activeTab: 'remembered'});
+                availableRows = rememberedData.data;
+              } else {
+                wx.navigateBack();
+              }
             }
           });
           return;
@@ -128,11 +133,16 @@ Page<IPageData>({
         availableRows = rememberedData.data;
         if (availableRows.length === 0) {
           wx.showModal({
-            title: '恭喜',
-            content: '你已经记住了所有的内容！',
+            title: '提示',
+            content: '你还没有已记住的内容！',
             showCancel: false,
             success: () => {
-              wx.navigateBack();
+              if (remainingData && remainingData.data.length > 0) {
+                this.setData({activeTab: 'learning'});
+                availableRows = remainingData.data;
+              } else {
+                wx.navigateBack();
+              }
             }
           });
           return;
@@ -146,6 +156,9 @@ Page<IPageData>({
     }
     else {
       nextIndex = this.data.row ? this.data.row.index + 1 : 0
+      if (nextIndex >= availableRows.length) {
+        nextIndex = 0;
+      }
     }
 
     let row = availableRows.find(row => row.index === nextIndex);
