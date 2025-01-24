@@ -165,25 +165,34 @@ Page<IPageData>({
   },
 
   onLongPress() {
-    const direction = this.data.activeTab === 'learning' ? 'right' : 'left';
-    this.setData({ isPressing: true, flyDirection: direction });
-    if (this.data.activeTab === 'learning') {
-      this.onRemembered();
-      this.setData({ text: '已标记为已记住' });
+    if (!this.data.isSettingsOpen) {
+      const direction = this.data.activeTab === 'learning' ? 'right' : 'left';
+      this.setData({ isPressing: true, flyDirection: direction });
+      if (this.data.activeTab === 'learning') {
+        this.onRemembered();
+        this.setData({ text: '已标记为已记住' });
+      }
+      else {
+        this.onNotRemembered();
+        this.setData({ text: '已标记为没记住' });
+      }
+      setTimeout(() => {
+        this.setData({ isPressing: false });
+      }, 800);
     }
     else {
-      this.onNotRemembered();
-      this.setData({ text: '已标记为没记住' });
+      this.setData({
+        isSettingsOpen: false
+      });
     }
-    setTimeout(() => {
-      this.setData({ isPressing: false });
-    }, 800);
   },
 
   onShortPress() {
-    this.showNextRow();
-    this.startTimer();
-    if (this.data.isSettingsOpen) {
+    if (!this.data.isSettingsOpen) {
+      this.showNextRow();
+      this.startTimer();
+    }
+    else {
       this.setData({
         isSettingsOpen: false
       });
