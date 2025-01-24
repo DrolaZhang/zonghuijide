@@ -17,7 +17,7 @@
      {{text}}
   </view>
 
-  <view class="content" wx:if="{{currentRow.length > 0}}">
+  <view class="content" wx:if="{{currentRow.length > 0}}" style="--content-font-size: {{fontSize}}px;">
     <view class="row-data">
       <view wx:for="{{currentRow}}" wx:key="index" class="row-item">
         {{item}}
@@ -61,7 +61,22 @@
                 bindtap="onModeChange">随机</view>
         </view>
       </view>
-      <view class="menu-item">设置项 3</view>
+      <view class="menu-item font-setting">
+        <view class="font-header">
+          <text>内容字体大小</text>
+          <text class="font-value">{{fontSize}}px</text>
+        </view>
+        <slider 
+          min="12" 
+          max="40" 
+          step="1" 
+          value="{{fontSize}}" 
+          block-size="20" 
+          activeColor="#34C759"
+          backgroundColor="#eee"
+          bindchange="onFontSizeChange"
+        />
+      </view>
     </view>
   </view>
 

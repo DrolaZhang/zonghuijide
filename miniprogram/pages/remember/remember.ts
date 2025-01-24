@@ -14,6 +14,9 @@ interface IPageData {
   flyDirection: string;
   remainingCount: number | null;
   rememberedCount: number | null;
+  showFeedback: string;
+  startX: number;
+  fontSize: number;
 }
 
 Page<IPageData>({
@@ -32,6 +35,9 @@ Page<IPageData>({
     isSettingsOpen: false,
     timerInterval: 5, // 默认5秒
     playMode: 'loop', // 默认循环模式
+    showFeedback: '',
+    startX: 0,
+    fontSize: 16, // 默认字体大小
   },
 
   onLoad(options: Record<string, string>) {
@@ -45,10 +51,12 @@ Page<IPageData>({
     // 读取本地存储的设置
     const savedInterval = wx.getStorageSync('timerInterval');
     const savedMode = wx.getStorageSync('playMode');
-
+    const savedFontSize = wx.getStorageSync('fontSize');
+    
     this.setData({
       timerInterval: savedInterval || 5,
-      playMode: savedMode || 'loop'
+      playMode: savedMode || 'loop',
+      fontSize: savedFontSize || 16
     });
   },
 
@@ -293,5 +301,34 @@ Page<IPageData>({
     wx.setStorageSync('playMode', mode);
     // TODO: 更新播放模式逻辑
     console.log(`Play mode changed to: ${mode}`);
+  },
+
+  // 字体大小改变事件
+  onFontSizeChange(e: WechatMiniprogram.SliderChange) {
+    const newSize = e.detail.value;
+    this.setData({ fontSize: newSize });
+    wx.setStorageSync('fontSize', newSize);
+    
+    // 更新页面内容的字体大小
+    this.updateContentFontSize();
+  },
+
+  // 更新内容字体大小
+  updateContentFontSize() {
+    const query = wx.createSelectorQuery();
+    query.selectAll('.content').fields({
+      dataset: true,
+      size: true,
+    }, (res) => {
+      if (res) {
+        console.log(this.data.fontSize)
+        // 使用CSS变量更新字体大小
+        wx.nextTick(() => {
+          this.setData({
+            ['--content-font-size']: `${this.data.fontSize}rpx`
+          });
+        });
+      }
+    }).exec();
   },
 }); 
