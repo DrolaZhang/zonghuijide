@@ -33,7 +33,7 @@ Page<IPageData>({
     timerInterval: 5, // 默认5秒
     playMode: 'loop', // 默认循环模式
     fontSize: 16, // 默认字体大小
-    currentIndex: 0,
+    currentIndex: -1,
     isTimerPaused: false,
     tapCount: 0,
   },
@@ -69,29 +69,16 @@ Page<IPageData>({
     }
   },
 
-  stopTimer() {
-    if (this.data.timer) {
-      clearInterval(this.data.timer);
-      this.data.timer = undefined;
-    }
-  },
-
   startTimer() {
     this.clearTimer();
     this.setData({ countdown: this.data.timerInterval });
-    console.log(this.data.isTimerPaused)
     if (!this.data.isTimerPaused) {
-
       const timer = setInterval(() => {
         const countdown = this.data.countdown - 1;
-
         if (countdown <= 0) {
-          // 倒计时结束，显示新数据
           this.showNextRow();
           this.setData({ countdown: this.data.timerInterval });
-
         } else {
-          // 更新倒计时
           this.setData({ countdown });
         }
 
@@ -105,6 +92,8 @@ Page<IPageData>({
   showNextRow() {
     const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
     const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
+    console.log(remainingData)
+    console.log(rememberedData)
     if (remainingData && rememberedData) {
       this.setData({
         remainingCount: remainingData.data.length,
@@ -160,13 +149,18 @@ Page<IPageData>({
       nextIndex = Math.floor(Math.random() * availableRows.length);
     }
     else {
-      nextIndex = this.data.currentIndex + 1
+      console.log(this.data.currentIndex)
+      if (this.data.currentIndex === -1) {
+        nextIndex = this.data.currentIndex + 1
+      }
       if (nextIndex > availableRows.length) {
         nextIndex = 0
       }
     }
+    console.log(nextIndex)
 
     let row = availableRows[nextIndex];
+    console.log(row)
     const rowContent = Object.values(row).filter(value => value !== row.index).map(value => String(value));
     this.setData({
       currentRow: rowContent,
@@ -198,7 +192,6 @@ Page<IPageData>({
   },
 
   onContentTap() {
-    console.log("onContentTap")
     const newPausedState = !this.data.isTimerPaused;
     this.setData({
       isTimerPaused: newPausedState
@@ -209,9 +202,9 @@ Page<IPageData>({
       icon: 'none',
       duration: 1000
     });
-    console.log(this.data.isTimerPaused)
+
     if (this.data.isTimerPaused) {
-      this.stopTimer();
+      this.clearTimer();
     }
     else {
       this.startTimer()
@@ -219,8 +212,6 @@ Page<IPageData>({
   },
 
   onShortPress() {
-    console.log("on short press")
-
     if (!this.data.isSettingsOpen) {
       this.showNextRow();
       this.startTimer();
