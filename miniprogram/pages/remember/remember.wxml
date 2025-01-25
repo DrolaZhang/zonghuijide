@@ -20,7 +20,7 @@
   <view class="content" wx:if="{{currentRow.length > 0}}" style="--content-font-size: {{fontSize}}px;">
     <view class="row-data">
       <view wx:for="{{currentRow}}" wx:key="index" class="row-item">
-        {{item}}
+        <text catchtap="onContentTap">{{item}}</text>
       </view>
     </view>
     <view class="timer">{{countdown}}s 后更新</view>

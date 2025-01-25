@@ -70,14 +70,18 @@ Page<IPageData>({
   },
 
   stopTimer() {
-    this.clearTimer()
+    if (this.data.timer) {
+      clearInterval(this.data.timer);
+      this.data.timer = undefined;
+    }
   },
 
   startTimer() {
     this.clearTimer();
     this.setData({ countdown: this.data.timerInterval });
-
+    console.log(this.data.isTimerPaused)
     if (!this.data.isTimerPaused) {
+
       const timer = setInterval(() => {
         const countdown = this.data.countdown - 1;
 
@@ -193,54 +197,40 @@ Page<IPageData>({
     }
   },
 
-  onShortPress() {
+  onContentTap() {
+    console.log("onContentTap")
+    const newPausedState = !this.data.isTimerPaused;
     this.setData({
-      tapCount: this.data.tapCount + 1
+      isTimerPaused: newPausedState
     });
 
-    if (this.tapTimer) {
-      clearTimeout(this.tapTimer);
+    wx.showToast({
+      title: newPausedState ? '已暂停' : '已恢复',
+      icon: 'none',
+      duration: 1000
+    });
+    console.log(this.data.isTimerPaused)
+    if (this.data.isTimerPaused) {
+      this.stopTimer();
+    }
+    else {
+      this.startTimer()
+    }
+  },
+
+  onShortPress() {
+    console.log("on short press")
+
+    if (!this.data.isSettingsOpen) {
+      this.showNextRow();
+      this.startTimer();
+    }
+    else {
+      this.setData({
+        isSettingsOpen: false
+      });
     }
 
-    // 设置延迟处理
-    this.tapTimer = setTimeout(() => {
-      if (this.data.tapCount === 1) {
-        // 单击逻辑
-        if (!this.data.isSettingsOpen) {
-          this.showNextRow();
-          this.startTimer();
-        }
-        else {
-          this.setData({
-            isSettingsOpen: false
-          });
-        }
-      } else if (this.data.tapCount === 2) {
-        // 双击逻辑
-        const newPausedState = !this.data.isTimerPaused;
-        this.setData({ 
-          isTimerPaused: newPausedState 
-        });
-        
-        wx.showToast({
-          title: newPausedState ? '已暂停' : '已恢复',
-          icon: 'none',
-          duration: 1000
-        });
-        if (this.data.isTimerPaused) {
-          this.stopTimer();
-        }
-        else {
-          this.startTimer()
-        }
-      }
-
-      // 重置点击计数
-      this.setData({
-        tapCount: 0
-      });
-    }, 300);  // 3
-    return;
 
   },
 
