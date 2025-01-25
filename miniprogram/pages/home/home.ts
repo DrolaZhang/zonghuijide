@@ -23,7 +23,7 @@ Page<IPageData>({
             const defaultFile = {
                 name: '小程序使用指南',
                 uploadTime: new Date().toISOString(),
-                total: 6,
+                total: 8,
                 rememberedCount: 0,
             };
             const defaultContent = [

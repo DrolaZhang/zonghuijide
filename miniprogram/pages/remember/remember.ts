@@ -92,8 +92,7 @@ Page<IPageData>({
   showNextRow() {
     const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
     const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
-    console.log(remainingData)
-    console.log(rememberedData)
+
     if (remainingData && rememberedData) {
       this.setData({
         remainingCount: remainingData.data.length,
@@ -125,8 +124,8 @@ Page<IPageData>({
       nextIndex = Math.floor(Math.random() * availableRows.length);
     }
     else {
-      console.log(this.data.currentIndex)
-      if (this.data.currentIndex === -1) {
+      
+      if (this.data.currentIndex != -1) {
         nextIndex = this.data.currentIndex + 1
       }
       if (nextIndex > availableRows.length) {
