@@ -14,10 +14,8 @@ interface IPageData {
   flyDirection: string;
   remainingCount: number | null;
   rememberedCount: number | null;
-  totalCount: number;
-  showFeedback: string;
-  startX: number;
   fontSize: number;
+  currentIndex: number;
 }
 
 Page<IPageData>({
@@ -33,13 +31,11 @@ Page<IPageData>({
     flyDirection: 'right',
     remainingCount: null,
     rememberedCount: null,
-    totalCount: null,
     isSettingsOpen: false,
     timerInterval: 5, // 默认5秒
     playMode: 'loop', // 默认循环模式
-    showFeedback: '',
-    startX: 0,
     fontSize: 16, // 默认字体大小
+    currentIndex: 0
   },
 
   onLoad(options: Record<string, string>) {
@@ -54,14 +50,7 @@ Page<IPageData>({
     const savedInterval = wx.getStorageSync('timerInterval');
     const savedMode = wx.getStorageSync('playMode');
     const savedFontSize = wx.getStorageSync('fontSize');
-    const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
-    const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
-    if (remainingData && rememberedData) {
-      this.setData({
-        totalCount: remainingData.data.length + rememberedData.data.length
-      })
-    }
-    
+
     this.setData({
       timerInterval: savedInterval || 5,
       playMode: savedMode || 'loop',
@@ -126,7 +115,7 @@ Page<IPageData>({
             showCancel: false,
             success: () => {
               if (rememberedData && rememberedData.data.length > 0) {
-                this.setData({activeTab: 'remembered'});
+                this.setData({ activeTab: 'remembered' });
                 availableRows = rememberedData.data;
               } else {
                 wx.navigateBack();
@@ -147,7 +136,7 @@ Page<IPageData>({
             showCancel: false,
             success: () => {
               if (remainingData && remainingData.data.length > 0) {
-                this.setData({activeTab: 'learning'});
+                this.setData({ activeTab: 'learning' });
                 availableRows = remainingData.data;
               } else {
                 wx.navigateBack();
@@ -158,30 +147,24 @@ Page<IPageData>({
         }
       }
     }
-    const randomIndex = Math.floor(Math.random() * availableRows.length);
-    console.log(availableRows);
+
     let nextIndex = 0
     if (this.data.playMode === 'random') {
-      nextIndex = availableRows[randomIndex].index
+      nextIndex = Math.floor(Math.random() * availableRows.length);
     }
     else {
-      nextIndex = this.data.row ? this.data.row.index + 1 : 0
-      if (nextIndex >= rememberedData.data.length + remainingData.data.length) {
-        nextIndex = 0;
+      nextIndex = this.data.currentIndex + 1
+      if (nextIndex > availableRows.length) {
+        nextIndex = 0
       }
     }
 
-    let row = availableRows.find(row => row.index === nextIndex);
-
-    if (!row) {
-      row = availableRows
-        .filter(row => row.index > nextIndex)
-        .sort((a, b) => a.index - b.index)[0];
-    };
+    let row = availableRows[nextIndex];
     const rowContent = Object.values(row).filter(value => value !== row.index).map(value => String(value));
     this.setData({
       currentRow: rowContent,
-      row: row
+      row: row,
+      currentIndex: nextIndex
     });
 
 
@@ -223,13 +206,13 @@ Page<IPageData>({
   },
 
   onRemembered() {
-
     if (this.data.activeTab === 'learning') {
       const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
       const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
       remainingData.data = remainingData.data.filter(row => row.index !== this.data.row.index);
       wx.setStorageSync(`${this.data.name}_remaining`, remainingData);
       rememberedData.data.push(this.data.row);
+      rememberedData.data.sort((a, b) => a.index - b.index);
       wx.setStorageSync(`${this.data.name}_remembered`, rememberedData);
     }
 
@@ -239,13 +222,13 @@ Page<IPageData>({
   },
 
   onNotRemembered() {
-
     if (this.data.activeTab === 'remembered') {
       const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
       const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
       rememberedData.data = rememberedData.data.filter(row => row.index !== this.data.row.index);
       wx.setStorageSync(`${this.data.name}_remembered`, rememberedData);
       remainingData.data.push(this.data.row)
+      remainingData.data.sort((a, b) => a.index - b.index);
       wx.setStorageSync(`${this.data.name}_remaining`, remainingData);
     }
 
@@ -253,46 +236,6 @@ Page<IPageData>({
     this.startTimer();
   },
 
-  deleteFile() {
-    wx.showModal({
-      title: '确认删除',
-      content: `是否删除文件 ${this.data.name}？`,
-      success: (res) => {
-        if (res.confirm) {
-          try {
-            // 清除定时器
-            this.clearTimer();
-
-            // 删除本地存储的JSON数据
-            wx.removeStorageSync(this.data.name);
-
-            // 获取并更新文件列表
-            const fileList = wx.getStorageSync('excelFiles') || [];
-            const updatedFileList = fileList.filter(
-              (item: any) => item.name !== this.data.name
-            );
-            wx.setStorageSync('excelFiles', updatedFileList);
-
-            // 返回上一页
-            wx.navigateBack({
-              success: () => {
-                wx.showToast({
-                  title: '删除成功',
-                  icon: 'success'
-                });
-              }
-            });
-          } catch (error) {
-            console.error('删除文件失败：', error);
-            wx.showToast({
-              title: '删除失败',
-              icon: 'error'
-            });
-          }
-        }
-      }
-    });
-  },
 
   switchTab(e: any) {
     const tab = e.currentTarget.dataset.tab;
@@ -340,7 +283,7 @@ Page<IPageData>({
     const newSize = e.detail.value;
     this.setData({ fontSize: newSize });
     wx.setStorageSync('fontSize', newSize);
-    
+
     // 更新页面内容的字体大小
     this.updateContentFontSize();
   },
