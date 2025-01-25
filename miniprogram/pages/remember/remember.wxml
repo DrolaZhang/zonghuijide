@@ -13,7 +13,7 @@
     </view>
   </view>
 
-  <view class="press-feedback {{isPressing ? 'show-' + flyDirection : ''}}">
+  <view class="press-feedback {{isPressing ? 'show': ''}}">
      {{text}}
   </view>
 
@@ -24,6 +24,11 @@
       </view>
     </view>
     <view class="timer">{{countdown}}s 后更新</view>
+  </view>
+
+  <!-- 添加暂停状态指示 -->
+  <view class="pause-indicator" wx:if="{{isTimerPaused}}">
+    已暂停
   </view>
 
   <!-- 设置按钮和菜单 -->

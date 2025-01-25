@@ -156,16 +156,11 @@
 }
 
 /* 向右滑动时的样式 */
-.press-feedback.show-right {
+.press-feedback.show {
   animation: slideUp 0.6s ease-out;
   --feedback-text: '记住了';
 }
 
-/* 向左滑动时的样式 */
-.press-feedback.show-left {
-  animation: slideUp 0.6s ease-out;
-  --feedback-text: '没记住';
-}
 
 @keyframes slideUp {
   0% {
@@ -313,5 +308,18 @@
 
 .font-value {
   color: #666;
+}
+
+.pause-indicator {
+  position: fixed;
+  top: 20rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 8rpx 24rpx;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  z-index: 999;
 }
 

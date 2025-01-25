@@ -1,6 +1,5 @@
 interface IPageData {
   name: string;
-  total: number;
   countdown: number;
   timer?: number;
   activeTab: string;
@@ -11,31 +10,32 @@ interface IPageData {
   isSettingsOpen: boolean;
   isPressing: boolean;
   text: string;
-  flyDirection: string;
   remainingCount: number | null;
   rememberedCount: number | null;
   fontSize: number;
   currentIndex: number;
+  isTimerPaused: boolean;
+  tatapCount: number,
 }
 
 Page<IPageData>({
   data: {
     name: '',
-    total: 0,
     countdown: 10,
     activeTab: 'learning',
     currentRow: null,
     row: null,
     isPressing: false,
     text: '',
-    flyDirection: 'right',
     remainingCount: null,
     rememberedCount: null,
     isSettingsOpen: false,
     timerInterval: 5, // 默认5秒
     playMode: 'loop', // 默认循环模式
     fontSize: 16, // 默认字体大小
-    currentIndex: 0
+    currentIndex: 0,
+    isTimerPaused: false,
+    tapCount: 0,
   },
 
   onLoad(options: Record<string, string>) {
@@ -69,33 +69,38 @@ Page<IPageData>({
     }
   },
 
-  startTimer() {
-    // 清除可能存在的旧定时器
-    this.clearTimer();
+  stopTimer() {
+    console.log("Stpping timer")
+    this.clearTimer()
+  },
 
+  startTimer() {
+    this.clearTimer();
     this.setData({ countdown: this.data.timerInterval });
 
-    // 创建新的定时器
-    const timer = setInterval(() => {
-      const countdown = this.data.countdown - 1;
+    console.log(this.data.isTimerPaused)
+    if (!this.data.isTimerPaused) {
+      const timer = setInterval(() => {
+        const countdown = this.data.countdown - 1;
 
-      if (countdown <= 0) {
-        // 倒计时结束，显示新数据
-        this.showNextRow();
-        this.setData({ countdown: this.data.timerInterval });
+        if (countdown <= 0) {
+          // 倒计时结束，显示新数据
+          this.showNextRow();
+          this.setData({ countdown: this.data.timerInterval });
 
-      } else {
-        // 更新倒计时
-        this.setData({ countdown });
-      }
-    }, 1000);
+        } else {
+          // 更新倒计时
+          this.setData({ countdown });
+        }
 
-    // @ts-ignore - 将timer保存到this.data中
-    this.setData({ timer });
+      }, 1000);
+      this.setData({ timer });
+
+    }
+
   },
 
   showNextRow() {
-
     const remainingData = wx.getStorageSync(`${this.data.name}_remaining`);
     const rememberedData = wx.getStorageSync(`${this.data.name}_remembered`);
     if (remainingData && rememberedData) {
@@ -166,14 +171,12 @@ Page<IPageData>({
       row: row,
       currentIndex: nextIndex
     });
-
-
   },
 
   onLongPress() {
     if (!this.data.isSettingsOpen) {
       const direction = this.data.activeTab === 'learning' ? 'right' : 'left';
-      this.setData({ isPressing: true, flyDirection: direction });
+      this.setData({ isPressing: true });
       if (this.data.activeTab === 'learning') {
         this.onRemembered();
         this.setData({ text: '已标记为已记住' });
@@ -194,16 +197,58 @@ Page<IPageData>({
   },
 
   onShortPress() {
-    if (!this.data.isSettingsOpen) {
-      this.showNextRow();
-      this.startTimer();
+
+
+    this.setData({
+      tapCount: this.data.tapCount + 1
+    });
+
+    if (this.tapTimer) {
+      clearTimeout(this.tapTimer);
     }
-    else {
+
+    // 设置延迟处理
+    this.tapTimer = setTimeout(() => {
+      if (this.data.tapCount === 1) {
+        // 单击逻辑
+        if (!this.data.isSettingsOpen) {
+          this.showNextRow();
+          this.startTimer();
+        }
+        else {
+          this.setData({
+            isSettingsOpen: false
+          });
+        }
+      } else if (this.data.tapCount === 2) {
+        // 双击逻辑
+        const newPausedState = !this.data.isTimerPaused;
+        this.setData({ 
+          isTimerPaused: newPausedState 
+        });
+        
+        wx.showToast({
+          title: newPausedState ? '已暂停' : '已恢复',
+          icon: 'none',
+          duration: 1000
+        });
+        if (this.data.isTimerPaused) {
+          this.stopTimer();
+        }
+        else {
+          this.startTimer()
+        }
+      }
+
+      // 重置点击计数
       this.setData({
-        isSettingsOpen: false
+        tapCount: 0
       });
-    }
+    }, 300);  // 3
+    return;
+
   },
+
 
   onRemembered() {
     if (this.data.activeTab === 'learning') {
@@ -218,7 +263,6 @@ Page<IPageData>({
 
     this.showNextRow();
     this.startTimer();
-
   },
 
   onNotRemembered() {
@@ -235,7 +279,6 @@ Page<IPageData>({
     this.showNextRow();
     this.startTimer();
   },
-
 
   switchTab(e: any) {
     const tab = e.currentTarget.dataset.tab;
@@ -306,4 +349,5 @@ Page<IPageData>({
       }
     }).exec();
   },
+
 }); 
