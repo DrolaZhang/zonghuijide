@@ -128,14 +128,12 @@ Page<IPageData>({
       if (this.data.currentIndex != -1) {
         nextIndex = this.data.currentIndex + 1
       }
-      if (nextIndex > availableRows.length) {
+      if (nextIndex >= availableRows.length) {
         nextIndex = 0
       }
     }
-    console.log(nextIndex)
 
     let row = availableRows[nextIndex];
-    console.log(row)
     const rowContent = Object.values(row).filter(value => value !== row.index).map(value => String(value));
     this.setData({
       currentRow: rowContent,
