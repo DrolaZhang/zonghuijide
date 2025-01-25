@@ -166,7 +166,6 @@ Page<IPageData>({
     const updatedFileList = fileList.map(file => {
       try {
         // 获取文件的原始数据
-        const remainingData = wx.getStorageSync(`${file.name}_remaining`);
         const rememberedData = wx.getStorageSync(`${file.name}_remembered`);
         // 计算总数和已记住的数量
         
@@ -211,7 +210,7 @@ Page<IPageData>({
 
     wx.showModal({
       title: '确认删除',
-      content: `是否删除「${file.name.replace(/\.(xlsx|xls)$/i, '')}」？`,
+      content: `是否删除「${file.name}」？`,
       confirmText: '删除',
       confirmColor: '#FF3B30',
       success: (res) => {

@@ -70,7 +70,6 @@ Page<IPageData>({
   },
 
   stopTimer() {
-    console.log("Stpping timer")
     this.clearTimer()
   },
 
@@ -78,7 +77,6 @@ Page<IPageData>({
     this.clearTimer();
     this.setData({ countdown: this.data.timerInterval });
 
-    console.log(this.data.isTimerPaused)
     if (!this.data.isTimerPaused) {
       const timer = setInterval(() => {
         const countdown = this.data.countdown - 1;
@@ -175,7 +173,6 @@ Page<IPageData>({
 
   onLongPress() {
     if (!this.data.isSettingsOpen) {
-      const direction = this.data.activeTab === 'learning' ? 'right' : 'left';
       this.setData({ isPressing: true });
       if (this.data.activeTab === 'learning') {
         this.onRemembered();
@@ -197,8 +194,6 @@ Page<IPageData>({
   },
 
   onShortPress() {
-
-
     this.setData({
       tapCount: this.data.tapCount + 1
     });
@@ -259,6 +254,8 @@ Page<IPageData>({
       rememberedData.data.push(this.data.row);
       rememberedData.data.sort((a, b) => a.index - b.index);
       wx.setStorageSync(`${this.data.name}_remembered`, rememberedData);
+      console.log(remainingData)
+      console.log(rememberedData)
     }
 
     this.showNextRow();
