@@ -104,8 +104,8 @@ Page<IPageData>({
       if (remainingData && remainingData.data.length >= 0) {
         availableRows = remainingData.data;
         if (availableRows.length === 0) {
-          availableRows = [{content: '你已经记住了所有的内容！'}]
-          
+          availableRows = [{ content: '你已经记住了所有的内容！' }]
+
         }
       }
     }
@@ -113,8 +113,8 @@ Page<IPageData>({
       if (rememberedData && rememberedData.data.length >= 0) {
         availableRows = rememberedData.data;
         if (availableRows.length === 0) {
-          availableRows = [{content: '你还没有已记住的内容！'}]
-          
+          availableRows = [{ content: '你还没有已记住的内容！' }]
+
         }
       }
     }
@@ -124,10 +124,7 @@ Page<IPageData>({
       nextIndex = Math.floor(Math.random() * availableRows.length);
     }
     else {
-      
-      if (this.data.currentIndex != -1) {
-        nextIndex = this.data.currentIndex + 1
-      }
+      nextIndex = this.data.currentIndex + 1
       if (nextIndex >= availableRows.length) {
         nextIndex = 0
       }
@@ -170,11 +167,6 @@ Page<IPageData>({
       isTimerPaused: newPausedState
     });
 
-    wx.showToast({
-      title: newPausedState ? '已暂停' : '已恢复',
-      icon: 'none',
-      duration: 1000
-    });
 
     if (this.data.isTimerPaused) {
       this.clearTimer();

@@ -23,7 +23,7 @@ Page<IPageData>({
             const defaultFile = {
                 name: '小程序使用指南',
                 uploadTime: new Date().toISOString(),
-                total: 8,
+                total: 9,
                 rememberedCount: 0,
             };
             const defaultContent = [
@@ -34,7 +34,8 @@ Page<IPageData>({
                 { index: 4, 0: '长按记忆材料',1: '可删除记忆材料' },
                 { index: 5, 0: '点击设置',1: '可设置自动更新时间' },
                 { index: 6, 0: '点击设置',1: '设置播放模式：循环或随机' },
-                { index: 7, 0: '点击设置',1: '可设置字体大小' }
+                { index: 7, 0: '点击设置',1: '可设置字体大小' },
+                { index: 8, 0: '暂停状态下点击文字',1: '可恢复自动跳转' },
             ];
             
             wx.setStorageSync(`${defaultFile.name}_remaining`, { data: defaultContent });

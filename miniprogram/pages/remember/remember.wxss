@@ -310,16 +310,22 @@
   color: #666;
 }
 
-.pause-indicator {
+.feedback-container {
   position: fixed;
-  top: 20rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  padding: 8rpx 24rpx;
-  border-radius: 30rpx;
-  font-size: 24rpx;
-  z-index: 999;
+  bottom: 160rpx;  /* 与 press-feedback 相同的位置 */
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pause-text {
+  font-size: 32rpx;  /* 与 press-feedback 相同的字体大小 */
+  color: #666;
+  padding: 20rpx 40rpx;
+  border-radius: 8rpx;
+  background: rgba(255, 255, 255, 0.9);
 }
 
