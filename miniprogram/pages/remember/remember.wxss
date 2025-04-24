@@ -329,3 +329,46 @@
   background: rgba(255, 255, 255, 0.9);
 }
 
+.card-button {
+  position: fixed;
+  left: 30rpx;
+  bottom: 160rpx;
+  background: #fff;
+  padding: 20rpx 40rpx;
+  border-radius: 40rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.card-count {
+  background: #ff4d4f;
+  color: #fff;
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+}
+
+.item-list {
+  margin: 20rpx;
+}
+
+.item {
+  background: #fff;
+  padding: 20rpx;
+  margin-bottom: 10rpx;
+  border-radius: 10rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+  cursor: move;
+  transition: transform 0.2s;
+}
+
+.item:active {
+  transform: scale(1.02);
+  box-shadow: 0 4rpx 15rpx rgba(0, 0, 0, 0.2);
+}
+

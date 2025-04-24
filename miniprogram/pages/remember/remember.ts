@@ -15,7 +15,9 @@ interface IPageData {
   fontSize: number;
   currentIndex: number;
   isTimerPaused: boolean;
-  tatapCount: number,
+  tapCount: number;
+  cardCount: number;
+  currentItem: any;
 }
 
 Page<IPageData>({
@@ -35,7 +37,8 @@ Page<IPageData>({
     fontSize: 16, // 默认字体大小
     currentIndex: -1,
     isTimerPaused: false,
-    tapCount: 0,
+    cardCount: 0,
+    currentItem: null,
   },
 
   onLoad(options: Record<string, string>) {
@@ -56,6 +59,8 @@ Page<IPageData>({
       playMode: savedMode || 'loop',
       fontSize: savedFontSize || 16
     });
+
+    this.updateCardCount();
   },
 
   onUnload() {
@@ -186,10 +191,7 @@ Page<IPageData>({
         isSettingsOpen: false
       });
     }
-
-
   },
-
 
   onRemembered() {
     if (this.data.activeTab === 'learning') {
@@ -203,7 +205,6 @@ Page<IPageData>({
       console.log(remainingData)
       console.log(rememberedData)
     }
-
     this.showNextRow();
     this.startTimer();
   },
@@ -291,6 +292,50 @@ Page<IPageData>({
         });
       }
     }).exec();
+  },
+
+
+  // 更新卡片数量
+  updateCardCount() {
+    const cards = wx.getStorageSync(`${this.data.name}_cards`) || [];
+    console.log(cards.length)
+    this.setData({
+      cardCount: cards.length
+    });
+    console.log(this.data)
+  },
+
+  // 跳转到卡片页面
+  navigateToCardPage() {
+    wx.navigateTo({
+      url: `/pages/card/card?name=${encodeURIComponent(this.data.name)}`
+    });
+  },
+
+  // 添加当前 item 到卡片
+  addCurrentItemToCard() {
+    console.log(this.data)
+    if (this.data.currentIndex<0) {
+      wx.showToast({
+        title: '没有可添加的项目',
+        icon: 'none'
+      });
+      return;
+    }
+
+    const cards = wx.getStorageSync(`${this.data.name}_cards`) || [];
+    cards.push({
+      content: this.data.row,
+      createTime: new Date().toISOString()
+    });
+    wx.setStorageSync(`${this.data.name}_cards`, cards);
+    
+    this.updateCardCount();
+    
+    wx.showToast({
+      title: '已添加到卡片',
+      icon: 'success'
+    });
   },
 
 }); 

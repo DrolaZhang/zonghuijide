@@ -1,0 +1,117 @@
+.container {
+  padding: 30rpx;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.count {
+  color: #666;
+  font-size: 28rpx;
+}
+
+.card-list {
+  margin-bottom: 30rpx;
+}
+
+.card-item {
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+.card-item.selected {
+  background: #e6f7ff;
+  border: 2rpx solid #1890ff;
+}
+
+.content {
+  font-size: 28rpx;
+}
+
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 20rpx;
+  display: flex;
+  justify-content: space-around;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.action-btn {
+  flex: 1;
+  margin: 0 20rpx;
+  padding: 20rpx 0;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  color: #fff;
+}
+
+.action-btn.delete {
+  background: #ff4d4f;
+}
+
+.action-btn.generate {
+  background: #1890ff;
+}
+
+.add-card {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 20rpx;
+  display: flex;
+  gap: 20rpx;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.card-input {
+  flex: 1;
+  background: #f5f5f5;
+  padding: 20rpx;
+  border-radius: 10rpx;
+}
+
+.add-btn {
+  background: #1890ff;
+  color: #fff;
+  padding: 20rpx 40rpx;
+  border-radius: 10rpx;
+}
+
+.drop-zone {
+  background: #f5f5f5;
+  border: 2rpx dashed #ccc;
+  padding: 40rpx;
+  margin: 20rpx;
+  border-radius: 10rpx;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.drop-zone.drag-over {
+  background: #e6f7ff;
+  border-color: #1890ff;
+}
+
+.drop-hint {
+  color: #999;
+  font-size: 28rpx;
+}

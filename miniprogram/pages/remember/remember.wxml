@@ -1,5 +1,5 @@
 <view class="container" 
-      bindlongpress="onLongPress" bindtap="onShortPress">
+      bindlongpress="onLongPress" bindtap="onShortPress" bindtap="onTapPage">
   <view class="weui-tabs">
     <view class="weui-tabs-bar__wrp">
       <view class="weui-tabs-bar">
@@ -21,8 +21,18 @@
 
   <view class="content" wx:if="{{currentRow.length > 0}}" style="--content-font-size: {{fontSize}}px;">
     <view class="row-data">
-      <view wx:for="{{currentRow}}" wx:key="index" class="row-item">
-        <text catchtap="onContentTap">{{item}}</text>
+      <view class="item-list">
+        <view 
+          class="row-item" 
+          wx:for="{{currentRow}}" 
+          wx:key="index"
+          draggable="true"
+          binddragstart="onDragStart"
+          binddragend="onDragEnd"
+          data-index="{{index}}"
+        >
+          <text catchtap="onContentTap">{{item}}</text>
+        </view>
       </view>
     </view>
     <view class="timer">{{countdown}}s 后更新</view>
@@ -82,4 +92,15 @@
     </view>
   </view>
 
+  <!-- 修改卡片按钮，添加长按事件 -->
+  <view 
+    class="card-button" 
+    catchtap="navigateToCardPage"
+    catchlongpress="addCurrentItemToCard"
+  >
+    <text>卡片</text>
+    <view class="card-count" wx:if="{{cardCount > 0}}">{{cardCount}}</view>
+  </view>
+
+  <view class="press-feedback {{showFeedback}}">{{text}}</view>
 </view>
