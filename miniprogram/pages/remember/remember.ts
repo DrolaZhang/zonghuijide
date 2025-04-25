@@ -137,6 +137,7 @@ Page<IPageData>({
 
     let row = availableRows[nextIndex];
     const rowContent = Object.values(row).filter(value => value !== row.index).map(value => String(value));
+    console.log(rowContent)
     this.setData({
       currentRow: rowContent,
       row: row,
@@ -324,8 +325,9 @@ Page<IPageData>({
     }
 
     const cards = wx.getStorageSync(`${this.data.name}_cards`) || [];
+    
     cards.push({
-      content: this.data.row,
+      content: this.data.currentRow,
       createTime: new Date().toISOString()
     });
     wx.setStorageSync(`${this.data.name}_cards`, cards);

@@ -176,14 +176,19 @@ Page({
           const centerX = x + cardWidth / 2;
           const centerY = y + cardHeight / 2;
           
-          // 绘制内容（只显示值，不显示键）
+          // 只显示 value 值
+          // const value = content;
+          // ctx.fillText(value, centerX, centerY);
+
+
           const values = Object.values(content);
           const lineHeight = 30;
           const startY = centerY - (values.length * lineHeight) / 2;
-          
+
           values.forEach((value, i) => {
             ctx.fillText(value, centerX, startY + i * lineHeight);
           });
+
         });
 
         wx.canvasToTempFilePath({

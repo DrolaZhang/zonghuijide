@@ -13,8 +13,8 @@
       data-index="{{index}}"
     >
       <view class="item-content">
-        <view class="item-row" wx:for="{{item.content}}" wx:for-item="value" wx:for-index="key" wx:key="key">
-          <text class="item-value">{{value}}</text>
+        <view class="item-row">
+          <text class="item-value">{{item.content[0]}}</text>
         </view>
       </view>
     </view>
