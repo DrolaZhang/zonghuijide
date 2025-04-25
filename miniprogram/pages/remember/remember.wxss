@@ -330,17 +330,21 @@
 }
 
 .card-button {
+  
   position: fixed;
-  left: 30rpx;
-  bottom: 160rpx;
-  background: #fff;
-  padding: 20rpx 40rpx;
-  border-radius: 40rpx;
+  bottom: 40rpx;
+  left: 40rpx;
+  z-index: 1000;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: #ffffff;
   box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  
+  justify-content: center;
+
+
 }
 
 .card-count {

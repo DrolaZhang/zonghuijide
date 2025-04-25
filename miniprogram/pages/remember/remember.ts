@@ -137,7 +137,6 @@ Page<IPageData>({
 
     let row = availableRows[nextIndex];
     const rowContent = Object.values(row).filter(value => value !== row.index).map(value => String(value));
-    console.log(rowContent)
     this.setData({
       currentRow: rowContent,
       row: row,
@@ -299,11 +298,9 @@ Page<IPageData>({
   // 更新卡片数量
   updateCardCount() {
     const cards = wx.getStorageSync(`${this.data.name}_cards`) || [];
-    console.log(cards.length)
     this.setData({
       cardCount: cards.length
     });
-    console.log(this.data)
   },
 
   // 跳转到卡片页面
@@ -315,7 +312,7 @@ Page<IPageData>({
 
   // 添加当前 item 到卡片
   addCurrentItemToCard() {
-    console.log(this.data)
+    
     if (this.data.currentIndex<0) {
       wx.showToast({
         title: '没有可添加的项目',
@@ -325,10 +322,24 @@ Page<IPageData>({
     }
 
     const cards = wx.getStorageSync(`${this.data.name}_cards`) || [];
-    
+    console.log(this.data.currentRow)
+    console.log(cards)
+    const isDuplicate = cards.some(card => 
+      // console.log(card.content)
+      JSON.stringify(card.content) === JSON.stringify(this.data.currentRow)
+      // card.content === this.data.currentRow
+    );
+    console.log(isDuplicate)
+    if (isDuplicate) {
+      wx.showToast({
+        title: '内容已存在',
+        icon: 'none'
+      });
+      return;
+    }
+
     cards.push({
-      content: this.data.currentRow,
-      createTime: new Date().toISOString()
+      content: this.data.currentRow
     });
     wx.setStorageSync(`${this.data.name}_cards`, cards);
     
