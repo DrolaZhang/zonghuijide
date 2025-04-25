@@ -20,21 +20,47 @@
 }
 
 .card-list {
-  margin-bottom: 30rpx;
+  padding: 20rpx;
 }
 
 .card-item {
   background: #fff;
   padding: 20rpx;
-  border-radius: 10rpx;
   margin-bottom: 20rpx;
+  border-radius: 10rpx;
   box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
   transition: all 0.3s;
+  border: 2rpx solid transparent;
 }
 
 .card-item.selected {
   background: #e6f7ff;
   border: 2rpx solid #1890ff;
+  transform: scale(1.02);
+  box-shadow: 0 4rpx 15rpx rgba(24, 144, 255, 0.2);
+}
+
+.item-content {
+  width: 100%;
+}
+
+.item-row {
+  display: flex;
+  margin-bottom: 10rpx;
+  line-height: 1.4;
+}
+
+.item-label {
+  color: #666;
+  margin-right: 10rpx;
+  flex-shrink: 0;
+}
+
+.item-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .content {
@@ -46,8 +72,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: #fff;
   padding: 20rpx;
+  background: #fff;
   display: flex;
   justify-content: space-around;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
@@ -56,18 +82,21 @@
 .action-btn {
   flex: 1;
   margin: 0 20rpx;
-  padding: 20rpx 0;
-  border-radius: 10rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 40rpx;
   font-size: 28rpx;
-  color: #fff;
 }
 
 .action-btn.delete {
   background: #ff4d4f;
+  color: #fff;
 }
 
 .action-btn.generate {
   background: #1890ff;
+  color: #fff;
 }
 
 .add-card {
@@ -114,4 +143,40 @@
 .drop-hint {
   color: #999;
   font-size: 28rpx;
+}
+
+.preview-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.preview-container.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.preview-image {
+  width: 80%;
+  max-height: 70vh;
+  margin-bottom: 20rpx;
+}
+
+.preview-hint {
+  color: #fff;
+  font-size: 28rpx;
+  padding: 20rpx;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 10rpx;
 }

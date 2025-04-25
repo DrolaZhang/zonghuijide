@@ -6,20 +6,43 @@
 
   <view class="card-list">
     <view 
-      class="card-item {{selectedIndex === index ? 'selected' : ''}}" 
+      class="card-item {{selectedCards[index] ? 'selected' : ''}}" 
       wx:for="{{cards}}" 
       wx:key="index"
       catchtap="selectCard"
       data-index="{{index}}"
     >
-      <text class="content">{{item.content[0]}} + {{item.content[1]}} </text>
+      <view class="item-content">
+        <view class="item-row" wx:for="{{item.content}}" wx:for-item="value" wx:for-index="key" wx:key="key">
+          <text class="item-value">{{value}}</text>
+        </view>
+      </view>
     </view>
   </view>
 
   <!-- 底部操作栏 -->
-  <view class="action-bar" wx:if="{{selectedIndex !== -1}}">
-    <button class="action-btn delete" catchtap="deleteSelectedCard">删除</button>
+  <view class="action-bar" wx:if="{{hasSelectedCards}}">
+    <button class="action-btn delete" catchtap="deleteSelectedCards">删除</button>
     <button class="action-btn generate" catchtap="generateCard">生成卡片</button>
   </view>
 
+  <!-- 预览容器 -->
+  <view 
+    class="preview-container {{generatedCardPath ? 'show' : ''}}" 
+    catchtap="closePreview"
+  >
+    <image 
+      class="preview-image" 
+      src="{{generatedCardPath}}" 
+      mode="aspectFit"
+      catchlongpress="saveToAlbum"
+    />
+    <view class="preview-hint">长按保存到相册</view>
+  </view>
+
+  <canvas 
+    type="2d" 
+    id="cardCanvas" 
+    style="width: 750px; height: 1000px; position: fixed; left: -9999px;"
+  />
 </view>
