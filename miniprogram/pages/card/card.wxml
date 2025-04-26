@@ -1,9 +1,4 @@
 <view class="container">
-  <view class="header">
-    <text class="title">卡片管理</text>
-    <text class="count">共 {{cardCount}} 项</text>
-  </view>
-
   <view class="card-list">
     <view 
       class="card-item {{selectedCards[index] ? 'selected' : ''}}" 
@@ -21,7 +16,7 @@
   </view>
 
   <!-- 底部操作栏 -->
-  <view class="action-bar" wx:if="{{hasSelectedCards}}">
+  <view  wx:if="{{hasSelectedCards}}">
     <button class="action-btn delete" catchtap="deleteSelectedCards">删除</button>
     <button class="action-btn generate" catchtap="generateCard">生成卡片</button>
   </view>

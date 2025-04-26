@@ -19,9 +19,7 @@ Page({
 
   // 加载卡片数据
   loadCards() {
-    console.log(this.data.name)
     const cards = wx.getStorageSync(`${this.data.name}_cards`) || [];
-    console.log(cards)
     this.setData({
       cards,
       cardCount: cards.length,
@@ -77,6 +75,7 @@ Page({
 
   // 删除选中的卡片
   deleteSelectedCards() {
+    console.log('delete funtion called')
     const selectedIndexes = Object.keys(this.data.selectedCards)
       .filter(index => this.data.selectedCards[index])
       .map(Number);
@@ -228,9 +227,9 @@ Page({
       5: { rows: 3, cols: 2 },
       6: { rows: 3, cols: 2 },
       7: { rows: 3, cols: 3 },
-      8: { rows: 2, cols: 4 },
+      8: { rows: 4, cols: 2 },
       9: { rows: 3, cols: 3 },
-      10: { rows: 2, cols: 5 }
+      10: { rows: 5, cols: 2 }
     };
     return layouts[count] || layouts[10];
   },
