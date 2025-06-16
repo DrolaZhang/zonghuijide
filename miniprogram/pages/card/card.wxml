@@ -1,43 +1,19 @@
 <view class="container">
-  <view class="card-list">
-    <view 
-      class="card-item {{selectedCards[index] ? 'selected' : ''}}" 
-      wx:for="{{cards}}" 
-      wx:key="index"
-      catchtap="selectCard"
-      data-index="{{index}}"
-    >
-      <view class="item-content">
-        <view class="item-row">
-          <text class="item-value">{{item.content[0]}}</text>
-        </view>
-      </view>
-    </view>
+  <view class="input-section">
+    <textarea class="markdown-input" placeholder="请输入Markdown文本" bindinput="onInput" value="{{markdownText}}"></textarea>
+    <button class="generate-btn" bindtap="generateCard">生成卡片</button>
   </view>
 
-  <!-- 底部操作栏 -->
-  <view  wx:if="{{hasSelectedCards}}">
-    <button class="action-btn delete" catchtap="deleteSelectedCards">删除</button>
-    <button class="action-btn generate" catchtap="generateCard">生成卡片</button>
-  </view>
-
-  <!-- 预览容器 -->
-  <view 
-    class="preview-container {{generatedCardPath ? 'show' : ''}}" 
-    catchtap="closePreview"
-  >
+  <view class="preview-modal {{isPreviewVisible ? 'show' : ''}}" bindtap="closePreview">
     <image 
-      class="preview-image" 
-      src="{{generatedCardPath}}" 
-      mode="aspectFit"
-      catchlongpress="saveToAlbum"
-    />
-    <view class="preview-hint">长按保存到相册</view>
+      class="modal-image" 
+      src="{{previewImage}}" 
+      mode="widthFix"
+      catchtap="preventBubble"
+      bindlongpress="saveImage"
+    ></image>
+    <view class="modal-hint">长按保存到相册</view>
   </view>
 
-  <canvas 
-    type="2d" 
-    id="cardCanvas" 
-    style="width: 750px; height: 1000px; position: fixed; left: -9999px;"
-  />
+  <canvas type="2d" id="cardCanvas" style="width: 750px; height: 1000px; position: fixed; left: -9999px;"></canvas>
 </view>

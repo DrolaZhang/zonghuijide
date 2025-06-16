@@ -1,8 +1,18 @@
+// index.ts
 Page({
-  onLoad() {
-    // 直接跳转到 home 页面
-    wx.redirectTo({
-      url: '/pages/home/home'
-    });
-  }
-});
+    data: {
+        // 页面数据
+    },
+
+    goToHome(): void {
+        wx.navigateTo({
+            url: '/pages/home/home'
+        });
+    },
+
+    goToCard(): void {
+        wx.navigateTo({
+            url: '/pages/card/card'
+        });
+    }
+}) 
