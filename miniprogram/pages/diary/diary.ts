@@ -1,10 +1,15 @@
 // diary.ts
+interface IMedia {
+  type: 'image' | 'video';
+  url: string;
+}
+
 interface IDiary {
   id: string;
   text: string;
-  images: string[];
+  media: IMedia[];
   audio?: string;
-  video?: string;
+  audioDuration?: number;
   time: string;
 }
 
@@ -14,10 +19,14 @@ interface IPageData {
   showModal: boolean;
   newDiary: {
     text: string;
-    images: string[];
+    media: IMedia[];
     audio?: string;
-    video?: string;
+    audioDuration?: number;
   };
+  isRecording: boolean;
+  recordingTime: number;
+  voiceWaveHeight: number;
+  recorderManager: WechatMiniprogram.RecorderManager;
 }
 
 Page<IPageData>({
@@ -27,15 +36,20 @@ Page<IPageData>({
     showModal: false,
     newDiary: {
       text: '',
-      images: [],
+      media: [],
       audio: undefined,
-      video: undefined
-    }
+      audioDuration: undefined
+    },
+    isRecording: false,
+    recordingTime: 0,
+    voiceWaveHeight: 20,
+    recorderManager: wx.getRecorderManager()
   },
 
   onLoad() {
     this.setCurrentDate();
     this.loadDiaries();
+    this.initRecorder();
   },
 
   setCurrentDate() {
@@ -53,19 +67,76 @@ Page<IPageData>({
     this.setData({ diaries });
   },
 
+  initRecorder() {
+    const recorderManager = this.data.recorderManager;
+    
+    recorderManager.onStart(() => {
+      console.log('录音开始');
+      this.startRecordingTimer();
+    });
+
+    recorderManager.onStop((res) => {
+      console.log('录音结束', res);
+      this.stopRecordingTimer();
+      if (res.duration > 0) {
+        this.setData({
+          'newDiary.audio': res.tempFilePath,
+          'newDiary.audioDuration': Math.round(res.duration / 1000)
+        });
+      }
+    });
+
+    recorderManager.onError((res) => {
+      console.error('录音错误:', res);
+      wx.showToast({
+        title: '录音失败',
+        icon: 'none'
+      });
+      this.stopRecordingTimer();
+    });
+  },
+
+  startRecordingTimer() {
+    let time = 0;
+    const timer = setInterval(() => {
+      time++;
+      this.setData({
+        recordingTime: time,
+        voiceWaveHeight: 20 + Math.random() * 40
+      });
+    }, 1000);
+
+    this.recordingTimer = timer;
+  },
+
+  stopRecordingTimer() {
+    if (this.recordingTimer) {
+      clearInterval(this.recordingTimer);
+      this.recordingTimer = undefined;
+    }
+    this.setData({
+      isRecording: false,
+      recordingTime: 0,
+      voiceWaveHeight: 20
+    });
+  },
+
   showAddModal() {
     this.setData({
       showModal: true,
       newDiary: {
         text: '',
-        images: [],
+        media: [],
         audio: undefined,
-        video: undefined
+        audioDuration: undefined
       }
     });
   },
 
   hideModal() {
+    if (this.data.isRecording) {
+      this.stopRecording();
+    }
     this.setData({ showModal: false });
   },
 
@@ -79,70 +150,70 @@ Page<IPageData>({
     });
   },
 
-  async chooseImage() {
+  async chooseMedia() {
     try {
       const res = await wx.chooseMedia({
         count: 9,
-        mediaType: ['image'],
+        mediaType: ['image', 'video'],
         sourceType: ['album', 'camera'],
-        sizeType: ['compressed']
+        sizeType: ['compressed'],
+        camera: 'back',
+        maxDuration: 60
       });
 
-      const newImages = [...this.data.newDiary.images, ...res.tempFiles.map(file => file.tempFilePath)];
+      const newMedia = res.tempFiles.map(file => ({
+        type: file.tempFilePath.includes('video') ? 'video' : 'image',
+        url: file.tempFilePath
+      }));
+
       this.setData({
-        'newDiary.images': newImages
+        'newDiary.media': [...this.data.newDiary.media, ...newMedia]
       });
     } catch (error) {
-      console.error('选择图片失败:', error);
+      console.error('选择媒体失败:', error);
     }
   },
 
-  async chooseAudio() {
-    try {
-      const res = await wx.chooseMessageFile({
-        count: 1,
-        type: 'file',
-        extension: ['mp3', 'wav']
-      });
-
-      this.setData({
-        'newDiary.audio': res.tempFiles[0].path
-      });
-    } catch (error) {
-      console.error('选择音频失败:', error);
+  startVoiceInput() {
+    if (this.data.isRecording) {
+      this.stopRecording();
+      return;
     }
+
+    this.setData({ isRecording: true });
+    this.data.recorderManager.start({
+      duration: 60000, // 最长录音时间，单位ms
+      sampleRate: 16000,
+      numberOfChannels: 1,
+      encodeBitRate: 48000,
+      format: 'mp3'
+    });
   },
 
-  async chooseVideo() {
-    try {
-      const res = await wx.chooseMedia({
-        count: 1,
-        mediaType: ['video'],
-        sourceType: ['album', 'camera'],
-        maxDuration: 60,
-        camera: 'back'
-      });
+  stopRecording() {
+    this.data.recorderManager.stop();
+  },
 
-      this.setData({
-        'newDiary.video': res.tempFiles[0].tempFilePath
-      });
-    } catch (error) {
-      console.error('选择视频失败:', error);
-    }
+  playAudio(e: any) {
+    const { src } = e.currentTarget.dataset;
+    const innerAudioContext = wx.createInnerAudioContext();
+    innerAudioContext.src = src;
+    innerAudioContext.play();
   },
 
   previewImage(e: any) {
     const { urls, current } = e.currentTarget.dataset;
+    const imageUrls = urls.filter((item: IMedia) => item.type === 'image').map((item: IMedia) => item.url);
     wx.previewImage({
-      urls,
+      urls: imageUrls,
       current
     });
   },
 
   saveDiary() {
-    if (!this.data.newDiary.text.trim()) {
+    if (!this.data.newDiary.text.trim() && !this.data.newDiary.media.length && !this.data.newDiary.audio) {
       wx.showToast({
-        title: '请输入文字内容',
+        title: '请输入内容',
         icon: 'none'
       });
       return;
@@ -154,9 +225,9 @@ Page<IPageData>({
     const newDiary: IDiary = {
       id: Date.now().toString(),
       text: this.data.newDiary.text,
-      images: this.data.newDiary.images,
+      media: this.data.newDiary.media,
       audio: this.data.newDiary.audio,
-      video: this.data.newDiary.video,
+      audioDuration: this.data.newDiary.audioDuration,
       time
     };
 

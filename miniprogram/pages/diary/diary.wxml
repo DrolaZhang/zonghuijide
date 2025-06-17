@@ -10,37 +10,35 @@
       <view class="diary-content">
         <text class="diary-text">{{item.text}}</text>
         
-        <!-- 图片展示 -->
-        <view class="media-container" wx:if="{{item.images.length > 0}}">
-          <image 
-            wx:for="{{item.images}}" 
-            wx:for-item="image" 
-            wx:key="*this"
-            src="{{image}}"
-            mode="aspectFill"
-            class="media-image"
-            bindtap="previewImage"
-            data-urls="{{item.images}}"
-            data-current="{{image}}"
-          />
+        <!-- 媒体展示 -->
+        <view class="media-container" wx:if="{{item.media.length > 0}}">
+          <block wx:for="{{item.media}}" wx:for-item="media" wx:key="*this">
+            <!-- 图片 -->
+            <image 
+              wx:if="{{media.type === 'image'}}"
+              src="{{media.url}}"
+              mode="aspectFill"
+              class="media-image"
+              bindtap="previewImage"
+              data-urls="{{item.media}}"
+              data-current="{{media.url}}"
+            />
+            <!-- 视频 -->
+            <video 
+              wx:if="{{media.type === 'video'}}"
+              src="{{media.url}}"
+              class="media-video"
+              controls
+            />
+          </block>
         </view>
 
-        <!-- 音频播放器 -->
+        <!-- 语音播放器 -->
         <view class="audio-player" wx:if="{{item.audio}}">
-          <audio 
-            src="{{item.audio}}" 
-            id="audio-{{item.id}}"
-            controls
-          />
-        </view>
-
-        <!-- 视频播放器 -->
-        <view class="video-player" wx:if="{{item.video}}">
-          <video 
-            src="{{item.video}}"
-            class="media-video"
-            controls
-          />
+          <view class="audio-content">
+            <image class="audio-icon" src="/images/audio.png" bindtap="playAudio" data-src="{{item.audio}}"/>
+            <text class="audio-duration">{{item.audioDuration}}s</text>
+          </view>
         </view>
 
         <text class="diary-time">{{item.time}}</text>
@@ -72,38 +70,49 @@
           value="{{newDiary.text}}"
         />
 
-        <view class="media-upload">
-          <view class="upload-btn" bindtap="chooseImage">
-            <text class="upload-icon">📷</text>
-            <text>图片</text>
+        <view class="toolbar">
+          <view class="tool-item" bindtap="chooseMedia">
+            
+            <text class="add-icon">@</text>
           </view>
-          <view class="upload-btn" bindtap="chooseAudio">
-            <text class="upload-icon">🎵</text>
-            <text>音频</text>
-          </view>
-          <view class="upload-btn" bindtap="chooseVideo">
-            <text class="upload-icon">🎥</text>
-            <text>视频</text>
+          <view class="tool-item" bindtap="startVoiceInput">
+            
+            <text class="add-icon">#</text>
           </view>
         </view>
 
-        <view class="preview-container" wx:if="{{newDiary.images.length > 0}}">
-          <image 
-            wx:for="{{newDiary.images}}" 
-            wx:key="*this"
-            src="{{item}}"
-            mode="aspectFill"
-            class="preview-image"
-            bindtap="previewImage"
-            data-urls="{{newDiary.images}}"
-            data-current="{{item}}"
-          />
+        <!-- 媒体预览 -->
+        <view class="preview-container" wx:if="{{newDiary.media.length > 0}}">
+          <block wx:for="{{newDiary.media}}" wx:key="*this">
+            <image 
+              wx:if="{{item.type === 'image'}}"
+              src="{{item.url}}"
+              mode="aspectFill"
+              class="preview-image"
+              bindtap="previewImage"
+              data-urls="{{newDiary.media}}"
+              data-current="{{item.url}}"
+            />
+            <video 
+              wx:if="{{item.type === 'video'}}"
+              src="{{item.url}}"
+              class="preview-video"
+              controls
+            />
+          </block>
+        </view>
+
+        <!-- 语音输入状态 -->
+        <view class="voice-input-status" wx:if="{{isRecording}}">
+          <view class="voice-wave">
+            <view class="wave-bar" wx:for="{{8}}" wx:key="*this" style="height: {{voiceWaveHeight}}rpx"></view>
+          </view>
+          <text class="recording-time">{{recordingTime}}s</text>
         </view>
       </view>
 
       <view class="modal-footer">
-        <button class="cancel-btn" bindtap="hideModal">取消</button>
-        <button class="confirm-btn" bindtap="saveDiary">保存</button>
+        <button class="save-btn" bindtap="saveDiary">保存</button>
       </view>
     </view>
   </view>
