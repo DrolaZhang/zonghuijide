@@ -1,10 +1,10 @@
 <view class="container">
-  <view class="content">
-    <!-- 这里放置原有内容 -->
-  </view>
-  
+
   <view class="button-group">
     <button class="nav-button" bindtap="goToHome">自定义记忆列表</button>
     <button class="nav-button" bindtap="goToCard">MarkDown生成卡片</button>
+    <button class="nav-button" bindtap="goToDiary">快乐过好每天</button>
   </view>
+
+
 </view>

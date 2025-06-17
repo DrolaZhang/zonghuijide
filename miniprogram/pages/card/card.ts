@@ -69,18 +69,39 @@ Page<IPageData>({
     });
 
     try {
+      console.log('开始创建画布...');
       const query = wx.createSelectorQuery();
       const canvas = await new Promise<WechatMiniprogram.Canvas>((resolve) => {
         query.select('#cardCanvas')
           .fields({ node: true, size: true })
           .exec((res) => {
+            console.log('Canvas查询结果:', res);
+            if (!res[0] || !res[0].node) {
+              console.error('Canvas节点未找到');
+              wx.showToast({
+                title: '创建画布失败',
+                icon: 'none'
+              });
+              return;
+            }
+            console.log('Canvas节点创建成功');
             const canvas = res[0].node;
             resolve(canvas);
           });
       });
 
+      if (!canvas) {
+        console.error('Canvas对象为空');
+        wx.hideLoading();
+        return;
+      }
+
+      console.log('开始获取Canvas上下文...');
       const ctx = canvas.getContext('2d');
+      console.log('Canvas上下文获取成功');
+
       const dpr = wx.getSystemInfoSync().pixelRatio;
+      console.log('设备像素比:', dpr);
       canvas.width = 750 * dpr;
       canvas.height = 1000 * dpr;
       ctx.scale(dpr, dpr);

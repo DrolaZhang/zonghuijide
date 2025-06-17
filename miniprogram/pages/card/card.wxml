@@ -1,19 +1,22 @@
 <view class="container">
-  <view class="input-section">
-    <textarea class="markdown-input" placeholder="请输入Markdown文本" bindinput="onInput" value="{{markdownText}}" maxlength="2000"></textarea>
-    <button class="generate-btn" bindtap="generateCard">生成卡片</button>
-  </view>
 
-  <view class="preview-modal {{isPreviewVisible ? 'show' : ''}}" bindtap="closePreview">
-    <image 
-      class="modal-image" 
-      src="{{previewImage}}" 
-      mode="widthFix"
-      catchtap="preventBubble"
-      bindlongpress="saveImage"
-    ></image>
+  <textarea class="markdown-input" placeholder="请输入Markdown文本" bindinput="onInput" value="{{markdownText}}" maxlength="2000"></textarea>
+
+  <button class="generate-btn" bindtap="generateCard">生成卡片</button>
+
+
+  <canvas 
+    type="2d" 
+    id="cardCanvas" 
+    style="width: 750px; height: 1000px; position: fixed; left: -9999px;"
+  ></canvas>
+
+  <view class="preview-modal" wx:if="{{isPreviewVisible}}" bindtap="closePreview">
+    <view class="preview-content" catchtap="preventBubble">
+    <image class="modal-image" src="{{previewImage}}" mode="widthFix" catchtap="preventBubble" bindlongpress="saveImage"></image>
     <view class="modal-hint">长按保存到相册</view>
+    </view>
   </view>
 
-  <canvas type="2d" id="cardCanvas" style="width: 750px; height: 1000px; position: fixed; left: -9999px;"></canvas>
+
 </view>

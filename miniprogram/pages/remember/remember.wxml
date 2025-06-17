@@ -92,15 +92,5 @@
     </view>
   </view>
 
-  <!-- 修改卡片按钮，添加长按事件 -->
-  <view 
-    class="card-button" 
-    catchtap="navigateToCardPage"
-    catchlongpress="addCurrentItemToCard"
-  >
-    <text>卡片</text>
-    <view class="card-count" wx:if="{{cardCount > 0}}">{{cardCount}}</view>
-  </view>
-
   <view class="press-feedback {{showFeedback}}">{{text}}</view>
 </view>

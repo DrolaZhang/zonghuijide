@@ -3,9 +3,11 @@
     "pages/index/index",
     "pages/home/home",
     "pages/remember/remember",
-    "pages/card/card"
+    "pages/card/card",
+    "pages/diary/diary"
   ],
   "window": {
+    "backgroundTextStyle": "light",
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "总会记住",
     "navigationBarBackgroundColor": "#ffffff"
@@ -17,5 +19,6 @@
     "scope.writePhotosAlbum": {
       "desc": "保存图片到相册"
     }
-  }
+  },
+  "sitemapLocation": "sitemap.json"
 }

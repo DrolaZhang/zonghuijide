@@ -1,0 +1,110 @@
+<!-- diary.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">记住每天</text>
+    <text class="date">{{currentDate}}</text>
+  </view>
+
+  <view class="diary-list" wx:if="{{diaries.length > 0}}">
+    <view class="diary-item" wx:for="{{diaries}}" wx:key="id">
+      <view class="diary-content">
+        <text class="diary-text">{{item.text}}</text>
+        
+        <!-- 图片展示 -->
+        <view class="media-container" wx:if="{{item.images.length > 0}}">
+          <image 
+            wx:for="{{item.images}}" 
+            wx:for-item="image" 
+            wx:key="*this"
+            src="{{image}}"
+            mode="aspectFill"
+            class="media-image"
+            bindtap="previewImage"
+            data-urls="{{item.images}}"
+            data-current="{{image}}"
+          />
+        </view>
+
+        <!-- 音频播放器 -->
+        <view class="audio-player" wx:if="{{item.audio}}">
+          <audio 
+            src="{{item.audio}}" 
+            id="audio-{{item.id}}"
+            controls
+          />
+        </view>
+
+        <!-- 视频播放器 -->
+        <view class="video-player" wx:if="{{item.video}}">
+          <video 
+            src="{{item.video}}"
+            class="media-video"
+            controls
+          />
+        </view>
+
+        <text class="diary-time">{{item.time}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <text>今天还没有记录哦~</text>
+  </view>
+
+  <view class="add-button" bindtap="showAddModal">
+    <text class="add-icon">+</text>
+  </view>
+
+  <!-- 添加日记的模态框 -->
+  <view class="modal" wx:if="{{showModal}}" bindtap="hideModal">
+    <view class="modal-content" catchtap="preventBubble">
+      <view class="modal-header">
+        <text class="modal-title">添加记录</text>
+        <text class="close-btn" bindtap="hideModal">×</text>
+      </view>
+
+      <view class="modal-body">
+        <textarea 
+          class="diary-input" 
+          placeholder="写下此刻的想法..."
+          bindinput="onTextInput"
+          value="{{newDiary.text}}"
+        />
+
+        <view class="media-upload">
+          <view class="upload-btn" bindtap="chooseImage">
+            <text class="upload-icon">📷</text>
+            <text>图片</text>
+          </view>
+          <view class="upload-btn" bindtap="chooseAudio">
+            <text class="upload-icon">🎵</text>
+            <text>音频</text>
+          </view>
+          <view class="upload-btn" bindtap="chooseVideo">
+            <text class="upload-icon">🎥</text>
+            <text>视频</text>
+          </view>
+        </view>
+
+        <view class="preview-container" wx:if="{{newDiary.images.length > 0}}">
+          <image 
+            wx:for="{{newDiary.images}}" 
+            wx:key="*this"
+            src="{{item}}"
+            mode="aspectFill"
+            class="preview-image"
+            bindtap="previewImage"
+            data-urls="{{newDiary.images}}"
+            data-current="{{item}}"
+          />
+        </view>
+      </view>
+
+      <view class="modal-footer">
+        <button class="cancel-btn" bindtap="hideModal">取消</button>
+        <button class="confirm-btn" bindtap="saveDiary">保存</button>
+      </view>
+    </view>
+  </view>
+</view> 

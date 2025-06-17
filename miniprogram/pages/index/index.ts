@@ -1,7 +1,11 @@
 // index.ts
-Page({
+interface IPageData {
+    // 添加需要的页面数据
+}
+
+Page<IPageData>({
     data: {
-        // 页面数据
+        // 初始化页面数据
     },
 
     goToHome(): void {
@@ -10,9 +14,15 @@ Page({
         });
     },
 
-    goToCard(): void {
+    goToCard() {
         wx.navigateTo({
             url: '/pages/card/card'
+        });
+    },
+
+    goToDiary() {
+        wx.navigateTo({
+            url: '/pages/diary/diary'
         });
     }
 }) 
