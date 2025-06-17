@@ -80,17 +80,18 @@
   bottom: 40rpx;
   width: 100rpx;
   height: 100rpx;
-  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  /* background: linear-gradient(135deg, #6e8efb, #a777e3); */
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 4rpx 12rpx rgba(110, 142, 251, 0.3);
+  
 }
 
 .add-icon {
-  color: #fff;
-  font-size: 48rpx;
+  color: rgb(0, 0, 0);
+  font-size: 68rpx;
   font-weight: 300;
 }
 
