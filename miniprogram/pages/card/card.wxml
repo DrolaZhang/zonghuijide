@@ -1,6 +1,6 @@
 <view class="container">
   <view class="input-section">
-    <textarea class="markdown-input" placeholder="请输入Markdown文本" bindinput="onInput" value="{{markdownText}}"></textarea>
+    <textarea class="markdown-input" placeholder="请输入Markdown文本" bindinput="onInput" value="{{markdownText}}" maxlength="2000"></textarea>
     <button class="generate-btn" bindtap="generateCard">生成卡片</button>
   </view>
 

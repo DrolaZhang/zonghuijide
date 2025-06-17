@@ -107,21 +107,81 @@ Page<IPageData>({
         if (line.startsWith('# ')) {
           ctx.font = 'bold 40px sans-serif';
           ctx.fillStyle = '#333333';
-          ctx.fillText(line.substring(2), padding, y);
+          const text = line.substring(2);
+          const words = text.split(' ');
+          let x = padding;
+          let currentLine = '';
+          
+          for (const word of words) {
+            const testLine = currentLine + word + ' ';
+            const metrics = ctx.measureText(testLine);
+            
+            if (metrics.width > maxWidth - 40) {
+              ctx.fillText(currentLine, x, y);
+              currentLine = word + ' ';
+              x = padding;
+              y += lineHeight;
+            } else {
+              currentLine = testLine;
+            }
+          }
+          if (currentLine) {
+            ctx.fillText(currentLine, x, y);
+          }
           y += lineHeight * 1.5;
           continue;
         }
         if (line.startsWith('## ')) {
           ctx.font = 'bold 36px sans-serif';
           ctx.fillStyle = '#333333';
-          ctx.fillText(line.substring(3), padding, y);
+          const text = line.substring(3);
+          const words = text.split(' ');
+          let x = padding;
+          let currentLine = '';
+          
+          for (const word of words) {
+            const testLine = currentLine + word + ' ';
+            const metrics = ctx.measureText(testLine);
+            
+            if (metrics.width > maxWidth - 40) {
+              ctx.fillText(currentLine, x, y);
+              currentLine = word + ' ';
+              x = padding;
+              y += lineHeight;
+            } else {
+              currentLine = testLine;
+            }
+          }
+          if (currentLine) {
+            ctx.fillText(currentLine, x, y);
+          }
           y += lineHeight * 1.3;
           continue;
         }
         if (line.startsWith('### ')) {
           ctx.font = 'bold 32px sans-serif';
           ctx.fillStyle = '#333333';
-          ctx.fillText(line.substring(4), padding, y);
+          const text = line.substring(4);
+          const words = text.split(' ');
+          let x = padding;
+          let currentLine = '';
+          
+          for (const word of words) {
+            const testLine = currentLine + word + ' ';
+            const metrics = ctx.measureText(testLine);
+            
+            if (metrics.width > maxWidth - 40) {
+              ctx.fillText(currentLine, x, y);
+              currentLine = word + ' ';
+              x = padding;
+              y += lineHeight;
+            } else {
+              currentLine = testLine;
+            }
+          }
+          if (currentLine) {
+            ctx.fillText(currentLine, x, y);
+          }
           y += lineHeight * 1.2;
           continue;
         }
@@ -129,54 +189,43 @@ Page<IPageData>({
         // 处理引用
         if (line.startsWith('> ')) {
           ctx.font = '32px sans-serif';
-          ctx.fillStyle = '#666666';
           // 绘制引用线
           ctx.beginPath();
-          ctx.moveTo(padding, y + 10);
-          ctx.lineTo(padding + 4, y + 10);
-          ctx.strokeStyle = '#999999';
+          ctx.moveTo(padding - 5, y - 5);
+          ctx.lineTo(padding - 5, y + lineHeight + 5);
+          ctx.strokeStyle = '#4a90e2';
           ctx.lineWidth = 2;
           ctx.stroke();
           // 绘制引用文本
           const text = line.substring(2);
           const words = text.split(' ');
           let x = padding + 20;
+          let currentLine = '';
+          
           for (const word of words) {
-            const wordWidth = ctx.measureText(word + ' ').width;
-            if (x + wordWidth > maxWidth) {
+            const testLine = currentLine + word + ' ';
+            const metrics = ctx.measureText(testLine);
+            
+            if (metrics.width > maxWidth - 60) { // 减去左右边距和引用线间距
+              ctx.fillStyle = '#666666';
+              ctx.fillText(currentLine, x, y);
+              currentLine = word + ' ';
               x = padding + 20;
               y += lineHeight;
+              // 继续绘制引用线
+              ctx.beginPath();
+              ctx.moveTo(padding - 5, y - 5);
+              ctx.lineTo(padding - 5, y + lineHeight + 5);
+              ctx.strokeStyle = '#4a90e2';
+              ctx.lineWidth = 2;
+              ctx.stroke();
+            } else {
+              currentLine = testLine;
             }
-            ctx.fillText(word + ' ', x, y);
-            x += wordWidth;
           }
-          y += lineHeight;
-          continue;
-        }
-
-        // 处理代码块
-        if (line.startsWith('```')) {
-          ctx.font = '28px monospace';
-          ctx.fillStyle = '#333333';
-          // 绘制代码块背景
-          ctx.fillStyle = '#f5f5f5';
-          ctx.fillRect(padding - 10, y - 10, maxWidth + 20, lineHeight + 20);
-          ctx.fillStyle = '#333333';
-          const code = line.substring(3);
-          const words = code.split(' ');
-          let x = padding;
-          for (const word of words) {
-            const wordWidth = ctx.measureText(word + ' ').width;
-            if (x + wordWidth > maxWidth) {
-              x = padding;
-              y += lineHeight;
-              // 继续绘制代码块背景
-              ctx.fillStyle = '#f5f5f5';
-              ctx.fillRect(padding - 10, y - 10, maxWidth + 20, lineHeight + 20);
-              ctx.fillStyle = '#333333';
-            }
-            ctx.fillText(word + ' ', x, y);
-            x += wordWidth;
+          if (currentLine) {
+            ctx.fillStyle = '#666666';
+            ctx.fillText(currentLine, x, y);
           }
           y += lineHeight + 10;
           continue;
@@ -186,23 +235,33 @@ Page<IPageData>({
         if (line.includes('**')) {
           const parts = line.split('**');
           let x = padding;
+          let currentLine = '';
+          let isBold = false;
+          
           for (let j = 0; j < parts.length; j++) {
-            if (j % 2 === 0) {
-              ctx.font = '32px sans-serif';
-            } else {
-              ctx.font = 'bold 32px sans-serif';
-            }
             const text = parts[j];
             const words = text.split(' ');
+            
             for (const word of words) {
-              const wordWidth = ctx.measureText(word + ' ').width;
-              if (x + wordWidth > maxWidth) {
+              ctx.font = isBold ? 'bold 32px sans-serif' : '32px sans-serif';
+              const testLine = currentLine + word + ' ';
+              const metrics = ctx.measureText(testLine);
+              
+              if (metrics.width > maxWidth - 40) {
+                ctx.fillStyle = '#333333';
+                ctx.fillText(currentLine, x, y);
+                currentLine = word + ' ';
                 x = padding;
                 y += lineHeight;
+              } else {
+                currentLine = testLine;
               }
-              ctx.fillText(word + ' ', x, y);
-              x += wordWidth;
             }
+            isBold = !isBold;
+          }
+          if (currentLine) {
+            ctx.fillStyle = '#333333';
+            ctx.fillText(currentLine, x, y);
           }
           y += lineHeight;
           continue;
@@ -212,23 +271,33 @@ Page<IPageData>({
         if (line.includes('*')) {
           const parts = line.split('*');
           let x = padding;
+          let currentLine = '';
+          let isItalic = false;
+          
           for (let j = 0; j < parts.length; j++) {
-            if (j % 2 === 0) {
-              ctx.font = '32px sans-serif';
-            } else {
-              ctx.font = 'italic 32px sans-serif';
-            }
             const text = parts[j];
             const words = text.split(' ');
+            
             for (const word of words) {
-              const wordWidth = ctx.measureText(word + ' ').width;
-              if (x + wordWidth > maxWidth) {
+              ctx.font = isItalic ? 'italic 32px sans-serif' : '32px sans-serif';
+              const testLine = currentLine + word + ' ';
+              const metrics = ctx.measureText(testLine);
+              
+              if (metrics.width > maxWidth - 40) {
+                ctx.fillStyle = '#333333';
+                ctx.fillText(currentLine, x, y);
+                currentLine = word + ' ';
                 x = padding;
                 y += lineHeight;
+              } else {
+                currentLine = testLine;
               }
-              ctx.fillText(word + ' ', x, y);
-              x += wordWidth;
             }
+            isItalic = !isItalic;
+          }
+          if (currentLine) {
+            ctx.fillStyle = '#333333';
+            ctx.fillText(currentLine, x, y);
           }
           y += lineHeight;
           continue;
@@ -242,14 +311,23 @@ Page<IPageData>({
           const text = line.substring(2);
           const words = text.split(' ');
           let x = padding + 30;
+          let currentLine = '';
+          
           for (const word of words) {
-            const wordWidth = ctx.measureText(word + ' ').width;
-            if (x + wordWidth > maxWidth) {
+            const testLine = currentLine + word + ' ';
+            const metrics = ctx.measureText(testLine);
+            
+            if (metrics.width > maxWidth - 70) { // 减去左边距和项目符号间距
+              ctx.fillText(currentLine, x, y);
+              currentLine = word + ' ';
               x = padding + 30;
               y += lineHeight;
+            } else {
+              currentLine = testLine;
             }
-            ctx.fillText(word + ' ', x, y);
-            x += wordWidth;
+          }
+          if (currentLine) {
+            ctx.fillText(currentLine, x, y);
           }
           y += lineHeight;
           continue;
@@ -266,14 +344,23 @@ Page<IPageData>({
             const text = line.substring(match[0].length);
             const words = text.split(' ');
             let x = padding + 40;
+            let currentLine = '';
+            
             for (const word of words) {
-              const wordWidth = ctx.measureText(word + ' ').width;
-              if (x + wordWidth > maxWidth) {
+              const testLine = currentLine + word + ' ';
+              const metrics = ctx.measureText(testLine);
+              
+              if (metrics.width > maxWidth - 80) { // 减去左边距和数字间距
+                ctx.fillText(currentLine, x, y);
+                currentLine = word + ' ';
                 x = padding + 40;
                 y += lineHeight;
+              } else {
+                currentLine = testLine;
               }
-              ctx.fillText(word + ' ', x, y);
-              x += wordWidth;
+            }
+            if (currentLine) {
+              ctx.fillText(currentLine, x, y);
             }
           }
           y += lineHeight;
@@ -283,28 +370,75 @@ Page<IPageData>({
         // 处理分割线
         if (line === '---' || line === '***') {
           ctx.beginPath();
-          ctx.moveTo(padding, y + lineHeight / 2);
-          ctx.lineTo(750 - padding, y + lineHeight / 2);
+          ctx.moveTo(padding, y);
+          ctx.lineTo(750 - padding, y);
           ctx.strokeStyle = '#e0e0e0';
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 5;
           ctx.stroke();
-          y += lineHeight * 1.5;
+          y += lineHeight  ; // 增加下方间距
+          continue;
+        }
+
+        // 处理代码块
+        if (line.startsWith('```')) {
+          const code = line.substring(3);
+          // 绘制代码块背景
+          ctx.fillStyle = '#f6f8fa';
+          ctx.fillRect(padding - 10, y - 10, maxWidth + 20, lineHeight + 20);
+          // 绘制代码文本
+          ctx.font = '28px monospace';
+          ctx.fillStyle = '#24292e';
+          const words = code.split(' ');
+          let x = padding;
+          let currentLine = '';
+          
+          for (const word of words) {
+            const testLine = currentLine + word + ' ';
+            const metrics = ctx.measureText(testLine);
+            
+            if (metrics.width > maxWidth - 40) {
+              ctx.fillText(currentLine, x, y);
+              currentLine = word + ' ';
+              x = padding;
+              y += lineHeight;
+              // 继续绘制代码块背景
+              ctx.fillStyle = '#f6f8fa';
+              ctx.fillRect(padding - 10, y - 10, maxWidth + 20, lineHeight + 20);
+              ctx.fillStyle = '#24292e';
+            } else {
+              currentLine = testLine;
+            }
+          }
+          if (currentLine) {
+            ctx.fillText(currentLine, x, y);
+          }
+          y += lineHeight + 10;
           continue;
         }
 
         // 处理普通文本
         ctx.font = '32px sans-serif';
-        ctx.fillStyle = '#333333';
         const words = line.split(' ');
         let x = padding;
+        let currentLine = '';
+        
         for (const word of words) {
-          const wordWidth = ctx.measureText(word + ' ').width;
-          if (x + wordWidth > maxWidth) {
+          const testLine = currentLine + word + ' ';
+          const metrics = ctx.measureText(testLine);
+          
+          if (metrics.width > maxWidth - 40) {
+            ctx.fillStyle = '#333333';
+            ctx.fillText(currentLine, x, y);
+            currentLine = word + ' ';
             x = padding;
             y += lineHeight;
+          } else {
+            currentLine = testLine;
           }
-          ctx.fillText(word + ' ', x, y);
-          x += wordWidth;
+        }
+        if (currentLine) {
+          ctx.fillStyle = '#333333';
+          ctx.fillText(currentLine, x, y);
         }
         y += lineHeight;
       }
