@@ -124,9 +124,152 @@ Page<IPageData>({
           continue;
         }
 
+        // 新增：处理箭头语法，将箭头后面的文字渲染为绿色，支持自动换行
+        const arrowMatch = line.match(/^(.*?)(\s*-->)\s*(.+)$/);
+        if (arrowMatch) {
+          ctx.font = '32px sans-serif';
+          const leftText = arrowMatch[1] + arrowMatch[2] + ' ';
+          const rightText = arrowMatch[3];
+          let x = padding;
+          let currentLine = '';
+          // 渲染左侧内容（自动换行）
+          const leftWords = leftText.split(' ');
+          for (const word of leftWords) {
+            const testLine = currentLine + word + ' ';
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth - 40) {
+              ctx.fillStyle = '#333333';
+              ctx.fillText(currentLine, x, y);
+              currentLine = word + ' ';
+              x = padding;
+              y += lineHeight;
+            } else {
+              currentLine = testLine;
+            }
+          }
+          if (currentLine) {
+            ctx.fillStyle = '#333333';
+            ctx.fillText(currentLine, x, y);
+            x += ctx.measureText(currentLine).width;
+          }
+          // 渲染右侧内容为绿色（自动换行）
+          let rightLine = '';
+          const rightWords = rightText.split(' ');
+          for (const word of rightWords) {
+            const testLine = rightLine + word + ' ';
+            const metrics = ctx.measureText(testLine);
+            if (x + metrics.width > padding + maxWidth - 40) {
+              ctx.fillStyle = '#27ae60';
+              ctx.fillText(rightLine, x, y);
+              rightLine = word + ' ';
+              x = padding;
+              y += lineHeight;
+            } else {
+              rightLine = testLine;
+            }
+          }
+          if (rightLine) {
+            ctx.fillStyle = '#27ae60';
+            ctx.fillText(rightLine, x, y);
+          }
+          y += lineHeight;
+          continue;
+        }
+
+        // 新增：处理括号内变色（支持中英文括号），支持自动换行
+        const parenReg = /([\(（])([^\)）]+)([\)）])/g;
+        if (parenReg.test(line)) {
+          ctx.font = '32px sans-serif';
+          let x = padding;
+          let lastIndex = 0;
+          let match;
+          parenReg.lastIndex = 0;
+          while ((match = parenReg.exec(line)) !== null) {
+            // 渲染括号前的内容（自动换行）
+            const before = line.substring(lastIndex, match.index);
+            if (before) {
+              const beforeWords = before.split(' ');
+              let beforeLine = '';
+              for (const word of beforeWords) {
+                const testLine = beforeLine + word + ' ';
+                const metrics = ctx.measureText(testLine);
+                if (x + metrics.width > padding + maxWidth - 40) {
+                  ctx.fillStyle = '#333333';
+                  ctx.fillText(beforeLine, x, y);
+                  beforeLine = word + ' ';
+                  x = padding;
+                  y += lineHeight;
+                } else {
+                  beforeLine = testLine;
+                }
+              }
+              if (beforeLine) {
+                ctx.fillStyle = '#333333';
+                ctx.fillText(beforeLine, x, y);
+                x += ctx.measureText(beforeLine).width;
+              }
+            }
+            // 渲染左括号
+            ctx.fillStyle = '#27ae60';
+            ctx.fillText(match[1], x, y);
+            x += ctx.measureText(match[1]).width;
+            // 渲染括号内内容（自动换行）
+            const insideWords = match[2].split(' ');
+            let insideLine = '';
+            for (const word of insideWords) {
+              const testLine = insideLine + word + ' ';
+              const metrics = ctx.measureText(testLine);
+              if (x + metrics.width > padding + maxWidth - 40) {
+                ctx.fillStyle = '#27ae60';
+                ctx.fillText(insideLine, x, y);
+                insideLine = word + ' ';
+                x = padding;
+                y += lineHeight;
+              } else {
+                insideLine = testLine;
+              }
+            }
+            if (insideLine) {
+              ctx.fillStyle = '#27ae60';
+              ctx.fillText(insideLine, x, y);
+              x += ctx.measureText(insideLine).width;
+            }
+            // 渲染右括号
+            ctx.fillStyle = '#27ae60';
+            ctx.fillText(match[3], x, y);
+            x += ctx.measureText(match[3]).width;
+            lastIndex = match.index + match[0].length;
+          }
+          // 渲染剩余内容（自动换行）
+          const after = line.substring(lastIndex);
+          if (after) {
+            const afterWords = after.split(' ');
+            let afterLine = '';
+            for (const word of afterWords) {
+              const testLine = afterLine + word + ' ';
+              const metrics = ctx.measureText(testLine);
+              if (x + metrics.width > padding + maxWidth - 40) {
+                ctx.fillStyle = '#333333';
+                ctx.fillText(afterLine, x, y);
+                afterLine = word + ' ';
+                x = padding;
+                y += lineHeight;
+              } else {
+                afterLine = testLine;
+              }
+            }
+            if (afterLine) {
+              ctx.fillStyle = '#333333';
+              ctx.fillText(afterLine, x, y);
+            }
+          }
+          y += lineHeight;
+          continue;
+        }
+
         // 处理标题
         if (line.startsWith('# ')) {
-          ctx.font = 'bold 40px sans-serif';
+          ctx.font = 'bold 36px sans-serif';
           ctx.fillStyle = '#333333';
           const text = line.substring(2);
           const words = text.split(' ');
@@ -153,7 +296,7 @@ Page<IPageData>({
           continue;
         }
         if (line.startsWith('## ')) {
-          ctx.font = 'bold 36px sans-serif';
+          ctx.font = 'bold 32px sans-serif';
           ctx.fillStyle = '#333333';
           const text = line.substring(3);
           const words = text.split(' ');
@@ -180,7 +323,7 @@ Page<IPageData>({
           continue;
         }
         if (line.startsWith('### ')) {
-          ctx.font = 'bold 32px sans-serif';
+          ctx.font = 'bold 28px sans-serif';
           ctx.fillStyle = '#333333';
           const text = line.substring(4);
           const words = text.split(' ');
@@ -209,7 +352,7 @@ Page<IPageData>({
 
         // 处理引用
         if (line.startsWith('> ')) {
-          ctx.font = '32px sans-serif';
+          ctx.font = '28px sans-serif';
           // 绘制引用线
           ctx.beginPath();
           ctx.moveTo(padding - 5, y - 5);
@@ -264,7 +407,7 @@ Page<IPageData>({
             const words = text.split(' ');
             
             for (const word of words) {
-              ctx.font = isBold ? 'bold 32px sans-serif' : '32px sans-serif';
+              ctx.font = isBold ? 'bold 28px sans-serif' : '28px sans-serif';
               const testLine = currentLine + word + ' ';
               const metrics = ctx.measureText(testLine);
               
@@ -300,7 +443,7 @@ Page<IPageData>({
             const words = text.split(' ');
             
             for (const word of words) {
-              ctx.font = isItalic ? 'italic 32px sans-serif' : '32px sans-serif';
+              ctx.font = isItalic ? 'italic 28px sans-serif' : '32px sans-serif';
               const testLine = currentLine + word + ' ';
               const metrics = ctx.measureText(testLine);
               
@@ -326,7 +469,7 @@ Page<IPageData>({
 
         // 处理列表
         if (line.startsWith('- ')) {
-          ctx.font = '32px sans-serif';
+          ctx.font = '28px sans-serif';
           ctx.fillStyle = '#666666';
           ctx.fillText('•', padding, y);
           const text = line.substring(2);
